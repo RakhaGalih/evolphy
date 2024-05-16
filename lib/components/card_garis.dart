@@ -11,7 +11,7 @@ class CardGaris extends StatelessWidget {
     return Container(
         decoration: BoxDecoration(
             color: Colors.white,
-            border: Border.all(color: abuGaris),
+            border: Border.all(color: kAbu),
             borderRadius: BorderRadius.circular(12)),
         child: child);
   }

@@ -1,0 +1,12 @@
+{
+    "files.autoSave": "onFocusChange",
+    "editor.cursorStyle": "line",
+    "debug.console.fontFamily": "",
+    "editor.fontFamily": "Courier Prime, Menlo, Monaco, 'Courier New', monospace",
+    "editor.codeLensFontFamily": "Courier Prime",
+    "editor.experimentalInlineEdit.fontFamily": "Courier Prime",
+    "editor.inlineSuggest.fontFamily": "Courier Prime",
+    "scm.inputFontFamily": "default",
+    "chat.editor.fontFamily": "Courier Prime",
+    "markdown.preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif"
+}
