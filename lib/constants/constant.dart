@@ -8,6 +8,7 @@ const kUngu = Color(0xFFAD46FD);
 const kUnguGelap = Color(0xFF692A99);
 const kWhite = Color(0xFFFAFAFA);
 const kGreyText = Color(0xFFABABAB);
+const kGreySecondary = Color(0xFFB0B0B0);
 const kGrey = Color(0xFF40444C);
 const kBG = Color(0xFF1C202A);
 const kRed = Color(0xFFFF7070);

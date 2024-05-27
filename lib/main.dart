@@ -28,7 +28,7 @@ class MainApp extends StatelessWidget {
         theme: ThemeData(
             primaryTextTheme: Typography().white,
             textTheme: Typography().white,
-            fontFamily: 'Outfit',
+            fontFamily: "Outfit",
             scaffoldBackgroundColor: kBG,
             primaryColor: kUngu,
             hoverColor: kUngu,

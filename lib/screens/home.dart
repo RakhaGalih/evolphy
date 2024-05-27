@@ -3,6 +3,7 @@ import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/data_model.dart';
 import 'package:evolphy/models/navcard_model.dart';
 import 'package:evolphy/screens/homepage.dart';
+import 'package:evolphy/screens/leveling.dart';
 import 'package:evolphy/screens/profile.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,8 @@ class Home extends StatelessWidget {
     return Consumer<DataModel>(builder: (context, data, child) {
       List<Widget> widgetOptions = <Widget>[
         const HomePage(),
-        const ProfilePage()
+        const ProfilePage(),
+        const Leveling()
       ];
       return Scaffold(
         body: widgetOptions[data.selectedNavBar],
