@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "604541571955",
+    "project_id": "evolphy-cfb2e",
+    "storage_bucket": "evolphy-cfb2e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604541571955:android:5407b6bef086a7a9842b06",
+        "android_client_info": {
+          "package_name": "com.example.evolphy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjAwKZBHSx94Cv9lGDN7GKaelZI4yELIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

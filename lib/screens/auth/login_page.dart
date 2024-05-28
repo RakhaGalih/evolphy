@@ -1,4 +1,6 @@
 import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/screens/homepage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../components/continue_card.dart';
@@ -13,6 +15,27 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool isChecked = false;
   bool isObscured = true;
+
+  final _auth = FirebaseAuth.instance;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  String _errorMessage = '';
+
+  Future<void> _signIn() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      // Navigate to Home Screen
+      Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message!;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                       height: 30,
                     ),
                     TextField(
+                      controller: _emailController,
                       decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 30.0, vertical: 20),
@@ -55,6 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                       height: 20,
                     ),
                     TextField(
+                      controller: _passwordController,
                       obscureText: isObscured,
                       autofocus: true,
                       decoration: InputDecoration(
@@ -92,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushReplacementNamed(context, '/home');
+                        _signIn();
                       },
                       child: Container(
                         alignment: Alignment.center,

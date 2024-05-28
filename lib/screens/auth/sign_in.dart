@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evolphy/constants/constant.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../components/continue_card.dart';
@@ -13,6 +15,37 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   bool isChecked = false;
   bool isObscured = true;
+
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  String _errorMessage = '';
+
+  Future<void> _signUp() async {
+    try {
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      // Save username to Firestore
+      await _firestore.collection('users').doc(userCredential.user?.uid).set({
+        'username': _usernameController.text,
+        'email': _emailController.text,
+      });
+
+      // Navigate to Home Screen
+      Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message!;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +72,7 @@ class _SignInPageState extends State<SignInPage> {
                       height: 30,
                     ),
                     TextField(
+                      controller: _usernameController,
                       decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 30.0, vertical: 20),
@@ -59,6 +93,7 @@ class _SignInPageState extends State<SignInPage> {
                       height: 20,
                     ),
                     TextField(
+                      controller: _emailController,
                       decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 30.0, vertical: 20),
@@ -72,13 +107,14 @@ class _SignInPageState extends State<SignInPage> {
                               style: BorderStyle.none,
                             ),
                           ),
-                          hintText: 'No. Telepon'),
+                          hintText: 'Email'),
                       style: kRegularTextStyle,
                     ),
                     const SizedBox(
                       height: 20,
                     ),
                     TextField(
+                      controller: _passwordController,
                       obscureText: isObscured,
                       autofocus: true,
                       decoration: InputDecoration(
@@ -112,7 +148,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushReplacementNamed(context, '/home');
+                        _signUp();
                       },
                       child: Container(
                         alignment: Alignment.center,
