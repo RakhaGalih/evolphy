@@ -1,7 +1,6 @@
 import 'package:evolphy/constants/constant.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:evolphy/screens/page/soal_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class Leveling extends StatelessWidget {
   const Leveling({super.key});
@@ -67,9 +66,19 @@ class Leveling extends StatelessWidget {
                   const SizedBox(
                     height: 80,
                   ),
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Image.asset('images/playTiles.png')),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SoalPage(
+                                    isPembahasan: false,
+                                  )));
+                    },
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Image.asset('images/playTiles.png')),
+                  ),
                   Image.asset('images/activePath.png'),
                   Align(
                       alignment: Alignment.centerRight,

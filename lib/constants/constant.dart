@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const kAbuHitam = Color(0xFF252836);
 const kAbu = Color(0xFF4C4F5B);
-const kAbuText = Color(0xFF737373);
+const kAbuText = Color(0xFFB0B0B0);
 const kUnguText = Color(0xFFD1A6FF);
 const kUngu = Color(0xFFAD46FD);
 const kUnguGelap = Color(0xFF692A99);
