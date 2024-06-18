@@ -3,6 +3,7 @@ import 'package:evolphy/models/data_model.dart';
 import 'package:evolphy/screens/auth/login_page.dart';
 import 'package:evolphy/screens/auth/sign_in.dart';
 import 'package:evolphy/screens/home/home.dart';
+import 'package:evolphy/screens/page/materi_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,7 @@ class MainApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/signIn': (context) => const SignInPage(),
           '/home': (context) => const Home(),
+          '/materi': (context) => const MateriPage(),
         },
         theme: ThemeData(
             primaryTextTheme: Typography().white,

@@ -1,13 +1,14 @@
-import 'package:evolphy/components/navbar_icon.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/data_model.dart';
 import 'package:evolphy/models/navcard_model.dart';
 import 'package:evolphy/screens/home/forum.dart';
 import 'package:evolphy/screens/home/homepage.dart';
 import 'package:evolphy/screens/home/leveling.dart';
+import 'package:evolphy/screens/home/modul.dart';
 import 'package:evolphy/screens/home/profile.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
@@ -35,32 +36,41 @@ class Home extends StatelessWidget {
     ];
     return Consumer<DataModel>(builder: (context, data, child) {
       List<Widget> widgetOptions = <Widget>[
-        const HomePage(),
-        const ProfilePage(),
+        const BerandaPage(),
+        const ModulPage(),
         const Leveling(),
-        const ForumPage()
+        const ForumPage(),
+        const ProfilePage(),
       ];
       return Scaffold(
         body: widgetOptions[data.selectedNavBar],
-        bottomNavigationBar: Material(
-          color: kGreyText.withOpacity(0.2),
-          child: InkWell(
-            onTap: () {},
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: List.generate(
-                        navIcons.length,
-                        (index) => NavBarIcon(
-                              isActive: data.selectedNavBar == index,
-                              index: index,
-                              color: navIcons[index].color,
-                              icon: navIcons[index].icon,
-                              activeIcon: navIcons[index].activeIcon!,
-                            ))),
-              ),
+        bottomNavigationBar: Container(
+          color: const Color(0xFF252836),
+          padding: const EdgeInsets.fromLTRB(24, 18, 24, 5),
+          child: SafeArea(
+            child: GNav(
+              onTabChange: (index) {
+                Provider.of<DataModel>(context, listen: false)
+                    .onNavBarTapped(index);
+              },
+              backgroundColor: const Color(0xFF252836),
+              color: const Color(0xFF676D75),
+              activeColor: Colors.white,
+              tabBackgroundColor: const Color(0xFF9900CC),
+              gap: 4,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              iconSize: 24,
+              tabs: const [
+                GButton(
+                  icon: Icons.home_outlined,
+                  text: "Beranda",
+                  iconSize: 26,
+                ),
+                GButton(icon: Icons.book, text: "Modul"),
+                GButton(icon: Icons.timeline, text: "Latihan"),
+                GButton(icon: Icons.chat_outlined, text: "Forum"),
+                GButton(icon: Icons.person, text: "Profil"),
+              ],
             ),
           ),
         ),
