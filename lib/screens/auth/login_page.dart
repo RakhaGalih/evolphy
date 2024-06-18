@@ -116,7 +116,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        _signIn();
+                        //_signIn();
+                        Navigator.pushReplacementNamed(context, '/home');
                       },
                       child: Container(
                         alignment: Alignment.center,

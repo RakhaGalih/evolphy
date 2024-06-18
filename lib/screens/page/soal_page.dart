@@ -22,8 +22,10 @@ class SoalPage extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const NilaiPage()));
+            if (!isPembahasan) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const NilaiPage()));
+            }
           },
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,

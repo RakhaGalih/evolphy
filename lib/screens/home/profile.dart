@@ -17,12 +17,12 @@ class _ProfilePageState extends State<ProfilePage> {
       children: [
         Image.asset(
           'images/bg.png',
-          height: 200,
+          fit: BoxFit.fitWidth,
         ),
         Column(
           children: [
             const SizedBox(
-              height: 120,
+              height: 130,
             ),
             Image.asset(
               'images/profile.png',
