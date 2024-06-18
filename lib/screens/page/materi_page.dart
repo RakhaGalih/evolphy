@@ -23,8 +23,16 @@ class MateriPage extends StatelessWidget {
                     topRight: Radius.circular(10))),
           ),
         ),
-        const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          BackAppBar(title: 'Hasil Quiz'),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const BackAppBar(),
+          Text(
+            'Listrik dan Magnet',
+            style: kSemiBoldTextStyle.copyWith(fontSize: 24),
+          ),
+          Text(
+            'Listrik magnet  adalah cabang fisika  yang membahas interaksi antara medan listrik dan medan magnet.',
+            style: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          )
         ])
       ]),
     );

@@ -46,7 +46,7 @@ class ModulPage extends StatelessWidget {
                     child: LayoutBuilder(builder: (context, constraints) {
                       return GestureDetector(
                         onTap: () {
-                          Navigator.pushReplacementNamed(context, '/materi');
+                          Navigator.pushNamed(context, '/materi');
                         },
                         child: Stack(
                           clipBehavior: Clip.none,

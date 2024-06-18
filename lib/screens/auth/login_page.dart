@@ -1,8 +1,7 @@
 import 'package:evolphy/constants/constant.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../../../components/continue_card.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -49,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('images/LogoEvolphy.png'),
+                    SvgPicture.asset('images/logoEvolphy.svg'),
                     const SizedBox(
                       height: 40,
                     ),
@@ -133,9 +132,11 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
+                    /*
                     const SizedBox(
                       height: 10,
                     ),
+                    
                     Row(
                       children: [
                         Expanded(
@@ -177,6 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ],
                     )
+                    */
                   ],
                 ),
               ),

@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../../../components/continue_card.dart';
+import 'package:flutter_svg/svg.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -60,13 +59,9 @@ class _SignInPageState extends State<SignInPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('images/LogoEvolphy.png'),
+                    SvgPicture.asset('images/logoEvolphy.svg'),
                     const SizedBox(
                       height: 40,
-                    ),
-                    const Text(
-                      'Create New Account',
-                      style: kTitleTextStyle,
                     ),
                     const SizedBox(
                       height: 30,
@@ -167,6 +162,7 @@ class _SignInPageState extends State<SignInPage> {
                     const SizedBox(
                       height: 10,
                     ),
+                    /*
                     Row(
                       children: [
                         Expanded(
@@ -207,7 +203,7 @@ class _SignInPageState extends State<SignInPage> {
                           child: Image.asset('images/apple.png'),
                         ),
                       ],
-                    )
+                    )*/
                   ],
                 ),
               ),

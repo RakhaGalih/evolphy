@@ -1,6 +1,7 @@
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/screens/page/soal_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class Leveling extends StatelessWidget {
   const Leveling({super.key});
@@ -77,28 +78,28 @@ class Leveling extends StatelessWidget {
                     },
                     child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Image.asset('images/playTiles.png')),
+                        child: SvgPicture.asset('images/playTiles.svg')),
                   ),
-                  Image.asset('images/activePath.png'),
+                  SvgPicture.asset('images/activePath.svg'),
                   Align(
                       alignment: Alignment.centerRight,
-                      child: Image.asset('images/playTiles.png')),
-                  Image.asset('images/activePath.png'),
+                      child: SvgPicture.asset('images/playTiles.svg')),
+                  SvgPicture.asset('images/activePath.svg'),
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Image.asset('images/quizTiles.png')),
-                  Image.asset('images/disabledPath.png'),
+                      child: SvgPicture.asset('images/playTiles.svg')),
+                  SvgPicture.asset('images/disabledPath.svg'),
                   Align(
                       alignment: Alignment.centerRight,
-                      child: Image.asset('images/lockedTiles.png')),
-                  Image.asset('images/disabledPath.png'),
+                      child: SvgPicture.asset('images/lockedTiles.svg')),
+                  SvgPicture.asset('images/disabledPath.svg'),
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Image.asset('images/lockedTiles.png')),
-                  Image.asset('images/disabledPath.png'),
+                      child: SvgPicture.asset('images/lockedTiles.svg')),
+                  SvgPicture.asset('images/disabledPath.svg'),
                   Align(
                       alignment: Alignment.centerRight,
-                      child: Image.asset('images/lockedTiles.png')),
+                      child: SvgPicture.asset('images/lockedTiles.svg')),
                 ],
               ),
             ),

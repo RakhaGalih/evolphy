@@ -195,7 +195,7 @@ class _BerandaPage extends State<BerandaPage> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      Navigator.pushReplacementNamed(context, '/materi');
+                      Navigator.pushNamed(context, '/materi');
                     },
                     child: Container(
                       width: 165,
