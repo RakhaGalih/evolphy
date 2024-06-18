@@ -49,6 +49,7 @@ class Home extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(24, 18, 24, 5),
           child: SafeArea(
             child: GNav(
+              selectedIndex: data.selectedNavBar,
               onTabChange: (index) {
                 Provider.of<DataModel>(context, listen: false)
                     .onNavBarTapped(index);

@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import "package:evolphy/constants/constant.dart";
+import "package:evolphy/models/data_model.dart";
 import "package:evolphy/models/materi_model.dart";
 import "package:flutter/material.dart";
 import "package:flutter_svg/svg.dart";
+import "package:provider/provider.dart";
 
 class BerandaPage extends StatefulWidget {
   const BerandaPage({super.key});
@@ -182,7 +184,7 @@ class _BerandaPage extends State<BerandaPage> {
             ),
           ),
           SizedBox(height: 25),
-          lihatSemua("Modul Materi"),
+          lihatSemua("Modul Materi", 1, context),
           SizedBox(
             height: 10,
           ),
@@ -265,7 +267,7 @@ class _BerandaPage extends State<BerandaPage> {
           SizedBox(
             height: 25,
           ),
-          lihatSemua("Forum"),
+          lihatSemua("Forum", 3, context),
           SizedBox(
             height: 10,
           ),
@@ -356,7 +358,7 @@ class _BerandaPage extends State<BerandaPage> {
   }
 }
 
-Widget lihatSemua(String title) {
+Widget lihatSemua(String title, int index, BuildContext context) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     crossAxisAlignment: CrossAxisAlignment.center,
@@ -367,7 +369,9 @@ Widget lihatSemua(String title) {
       ),
       InkWell(
         borderRadius: BorderRadius.circular(100),
-        onTap: () {},
+        onTap: () {
+          Provider.of<DataModel>(context, listen: false).onNavBarTapped(index);
+        },
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
           child: Row(
