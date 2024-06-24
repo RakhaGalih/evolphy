@@ -80,14 +80,14 @@ class Leveling extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: SvgPicture.asset('images/playTiles.svg')),
                   ),
-                  SvgPicture.asset('images/activePath.svg'),
+                  SvgPicture.asset('images/disabledPath.svg'),
                   Align(
                       alignment: Alignment.centerRight,
-                      child: SvgPicture.asset('images/playTiles.svg')),
-                  SvgPicture.asset('images/activePath.svg'),
+                      child: SvgPicture.asset('images/lockedTiles.svg')),
+                  SvgPicture.asset('images/disabledPath.svg'),
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: SvgPicture.asset('images/playTiles.svg')),
+                      child: SvgPicture.asset('images/lockedTiles.svg')),
                   SvgPicture.asset('images/disabledPath.svg'),
                   Align(
                       alignment: Alignment.centerRight,

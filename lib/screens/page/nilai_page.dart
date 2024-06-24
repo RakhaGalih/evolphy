@@ -108,7 +108,7 @@ class NilaiPage extends StatelessWidget {
                     const SizedBox(
                       height: 20,
                     ),
-                    for (int i = 0; i < listSoal.length; i++)
+                    for (int i = 0; i < listKebenaranSoal.length; i++)
                       Column(
                         children: [
                           Row(
@@ -134,7 +134,7 @@ class NilaiPage extends StatelessWidget {
                                   Row(
                                     children: [
                                       for (int j = 0;
-                                          j < listSoal[i].length;
+                                          j < listKebenaranSoal[i].length;
                                           j++)
                                         GestureDetector(
                                             onTap: () {
@@ -149,7 +149,7 @@ class NilaiPage extends StatelessWidget {
                                             child: Padding(
                                               padding: const EdgeInsets.only(
                                                   right: 10),
-                                              child: listSoal[i][j],
+                                              child: listKebenaranSoal[i][j],
                                             ))
                                     ],
                                   )

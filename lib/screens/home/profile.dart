@@ -1,6 +1,9 @@
 import 'package:evolphy/components/profile_tile.dart';
 import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/services/firebase_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,12 +14,53 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool light = true;
+  String? _username;
+  String? _email;
+  String? _telepon;
+  String? _image;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+    getDataUser();
+  }
+
+  void getDataUser() async {
+    User? user = await AuthService().getCurrentUser();
+    if (user != null) {
+      String? fetchedUsername =
+          await getProperty('users', user.uid, 'username');
+      String? fetchedEmail = await getProperty('users', user.uid, 'email');
+      String? fetchedImage = await getProperty('users', user.uid, 'image');
+      String? fetchedTelepon = await getProperty('users', user.uid, 'telepon');
+      setState(() {
+        _username = fetchedUsername;
+        _email = fetchedEmail;
+        _image = fetchedImage;
+        _telepon = fetchedTelepon;
+      });
+    }
+  }
+
+  void _navigateAndDisplayResult(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, '/edit');
+
+    // Check what was returned and act accordingly
+    if (result != null) {
+      setState(() {
+        getDataUser();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Image.asset(
-          'images/bg.png',
+        SvgPicture.asset(
+          'images/bg.svg',
           fit: BoxFit.fitWidth,
         ),
         Column(
@@ -24,16 +68,23 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(
               height: 130,
             ),
-            Image.asset(
-              'images/profile.png',
-              width: 120,
-              height: 120,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(60),
+              child: CircleAvatar(
+                radius: 60,
+                backgroundColor: kAbuHitam,
+                child: networkImage(
+                    _image ??
+                        'https://firebasestorage.googleapis.com/v0/b/evolphy-cfb2e.appspot.com/o/Rectangle%206.png?alt=media&token=2b96ff1a-6c58-478d-8c4d-482cf3ba02ef',
+                    120,
+                    120),
+              ),
             ),
             const SizedBox(
               height: 10,
             ),
             Text(
-              'Rakha',
+              _username ?? 'null',
               style: kMediumTextStyle.copyWith(fontSize: 20),
             ),
             Padding(
@@ -48,9 +99,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: kMediumTextStyle.copyWith(fontSize: 14),
                       ),
                       const Spacer(),
-                      Text('Edit Profil',
-                          style: kRegularTextStyle.copyWith(
-                              fontSize: 14, color: kUnguText)),
+                      GestureDetector(
+                        onTap: () {
+                          _navigateAndDisplayResult(context);
+                        },
+                        child: Text('Edit Profil',
+                            style: kRegularTextStyle.copyWith(
+                                fontSize: 14, color: kUnguText)),
+                      ),
                     ],
                   ),
                   Container(
@@ -58,16 +114,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     margin: const EdgeInsets.symmetric(vertical: 15),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10), color: kGrey),
-                    child: const Column(
+                    child: Column(
                       children: [
-                        ProfileTile(title: 'Username', value: 'Rakha'),
-                        ProfileTile(
-                            title: 'No.telepon atau email',
-                            value: '+6281222333444'),
-                        ProfileTile(title: 'Password', value: '••••••••••'),
-                        ProfileTile(
-                            title: 'Alamat',
-                            value: 'Jl.Sukabirus no.4, Kec.Bojongsoang'),
+                        ProfileTile(title: 'Username', value: _username),
+                        ProfileTile(title: 'Email', value: _email),
+                        ProfileTile(title: 'No Telepon', value: _telepon),
+                        const ProfileTile(
+                            title: 'Password', value: '••••••••••'),
                       ],
                     ),
                   ),
@@ -111,10 +164,15 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(
                           height: 8,
                         ),
-                        const IconProfileTile(
-                          title: 'Logout',
-                          color: kRed,
-                          icon: Icons.logout,
+                        GestureDetector(
+                          onTap: () {
+                            logOut(context);
+                          },
+                          child: const IconProfileTile(
+                            title: 'Logout',
+                            color: kRed,
+                            icon: Icons.logout,
+                          ),
                         ),
                       ],
                     ),

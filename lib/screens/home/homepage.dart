@@ -92,7 +92,7 @@ class _BerandaPage extends State<BerandaPage> {
                           Padding(
                             padding: const EdgeInsets.only(top: 25),
                             child: Text(
-                              "Yey, kamu berada di level 2!",
+                              "Yey, kamu berada di level 1!",
                               style: TextStyle(
                                 color: Color(0xFFD7D8DB),
                                 fontWeight: FontWeight.bold,
@@ -114,9 +114,12 @@ class _BerandaPage extends State<BerandaPage> {
                               style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
-                                backgroundColor: Color(0xFFD7D8DB),
+                                backgroundColor: kWhite,
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Provider.of<DataModel>(context, listen: false)
+                                    .onNavBarTapped(2);
+                              },
                               child: Text(
                                 'Mulai Sekarang',
                                 style: TextStyle(

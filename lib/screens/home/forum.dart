@@ -94,25 +94,30 @@ class ForumPage extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-            color: kUngu, borderRadius: BorderRadius.circular(30)),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.add_circle,
-              color: kWhite,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Text(
-              'Unggah',
-              style: kSemiBoldTextStyle,
-            ),
-          ],
+      floatingActionButton: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(context, '/post');
+        },
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+              color: kUngu, borderRadius: BorderRadius.circular(30)),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.add_circle,
+                color: kWhite,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text(
+                'Unggah',
+                style: kSemiBoldTextStyle,
+              ),
+            ],
+          ),
         ),
       ),
     );

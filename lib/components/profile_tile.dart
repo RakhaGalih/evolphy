@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../constants/constant.dart';
 
 class ProfileTile extends StatelessWidget {
-  final String title, value;
+  final String title;
+  final String? value;
   const ProfileTile({super.key, required this.title, required this.value});
 
   @override
@@ -18,7 +19,7 @@ class ProfileTile extends StatelessWidget {
           ),
           const Spacer(),
           Text(
-            value,
+            value ?? '-',
             style: kRegularTextStyle.copyWith(
                 fontSize: 14, color: Colors.white.withOpacity(0.5)),
           ),

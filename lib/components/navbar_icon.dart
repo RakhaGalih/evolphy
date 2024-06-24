@@ -11,13 +11,13 @@ class NavBarIcon extends StatelessWidget {
   final IconData icon;
   final IconData activeIcon;
   const NavBarIcon({
-    Key? key,
+    super.key,
     required this.index,
     required this.isActive,
     required this.color,
     required this.icon,
     required this.activeIcon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
