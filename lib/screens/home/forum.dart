@@ -12,15 +12,33 @@ class ForumPage extends StatefulWidget {
 
 class _ForumPageState extends State<ForumPage> {
   final PostService _firebaseService = PostService();
-  final int _limit = 3;
+  final int _limitIncrement = 4;
+  int _limit = 4;
   DocumentSnapshot? _lastDocument;
   bool _isLoadingMore = false;
   final List<Map<String, dynamic>> _posts = [];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _loadPosts();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.atEdge) {
+      if (_scrollController.position.pixels != 0) {
+        _loadMorePosts();
+      }
+    }
   }
 
   Future<void> _loadPosts() async {
@@ -51,8 +69,33 @@ class _ForumPageState extends State<ForumPage> {
           _lastDocument = snapshot.docs.last;
           _isLoadingMore = false;
         });
+      } else {
+        setState(() {
+          _isLoadingMore = false;
+        });
       }
     });
+  }
+
+  Future<void> _loadMorePosts() async {
+    if (!_isLoadingMore) {
+      setState(() {
+        _isLoadingMore = true;
+        _limit += _limitIncrement;
+      });
+      _loadPosts();
+    }
+  }
+
+  void _navigateAndDisplayResult(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, '/post');
+
+    // Check what was returned and act accordingly
+    if (result != null) {
+      _posts.removeRange(0, _posts.length - 1);
+      await _loadPosts();
+      setState(() {});
+    }
   }
 
   @override
@@ -117,6 +160,7 @@ class _ForumPageState extends State<ForumPage> {
               ),
               Expanded(
                 child: ListView.builder(
+                    controller: _scrollController,
                     itemCount: _posts.length,
                     itemBuilder: (context, index) {
                       final post = _posts[index];
@@ -142,16 +186,23 @@ class _ForumPageState extends State<ForumPage> {
                                         child: Icon(Icons.person),
                                       ),
                                 const SizedBox(
-                                  width: 10,
+                                  width: 12,
                                 ),
-                                Text(post['username']),
+                                Text(
+                                  post['username'],
+                                  style:
+                                      kSemiBoldTextStyle.copyWith(fontSize: 16),
+                                ),
                               ],
                             ),
                             const SizedBox(
                               height: 20,
                             ),
-                            Text(post['content']),
-                            SizedBox(
+                            Text(
+                              post['content'],
+                              style: kMediumTextStyle,
+                            ),
+                            const SizedBox(
                               height: 20,
                             ),
                             (post['image_url'] != "")
@@ -186,14 +237,19 @@ class _ForumPageState extends State<ForumPage> {
                         ),
                       );
                     }),
-              )
+              ),
+              if (_isLoadingMore)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                ),
             ],
           ),
         ),
       ),
       floatingActionButton: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, '/post');
+          _navigateAndDisplayResult(context);
         },
         child: Container(
           padding: const EdgeInsets.all(12),

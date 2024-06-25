@@ -61,6 +61,20 @@ class _PostPageState extends State<PostPage> {
     }
   }
 
+  void _post() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _showSpinner = true;
+      });
+      await _firebaseService.createPost(
+          _contentController.text, _selectedImage);
+      Navigator.pop(context, 'update');
+      setState(() {
+        _showSpinner = false;
+      });
+    }
+  }
+
   void _clearImage() {
     setState(() {
       _selectedImage = null;
@@ -95,17 +109,7 @@ class _PostPageState extends State<PostPage> {
                         const Spacer(),
                         GestureDetector(
                           onTap: () async {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              setState(() {
-                                _showSpinner = true;
-                              });
-                              await _firebaseService.createPost(
-                                  _contentController.text, _selectedImage);
-                              Navigator.pop(context);
-                              setState(() {
-                                _showSpinner = false;
-                              });
-                            }
+                            _post();
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
