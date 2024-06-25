@@ -154,19 +154,49 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           ),
           Expanded(
             child: ListView.builder(
+              padding: const EdgeInsets.only(top: 20),
               itemCount: _comments.length,
               itemBuilder: (context, index) {
                 final comment = _comments[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(comment['userImage'] ?? ''),
-                  ),
-                  title: Text(comment['username'] ?? 'Unknown User'),
-                  subtitle: Column(
+                return Container(
+                  padding: const EdgeInsets.all(24),
+                  margin: const EdgeInsets.only(bottom: 12),
+                  color: kAbuHitam,
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(comment['content']),
-                      Text(comment['createdAt'].toDate().toString()),
+                      comment['userImage'] != null
+                          ? CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(widget.post['userImage']),
+                            )
+                          : const CircleAvatar(
+                              backgroundColor: kUngu,
+                              child: Icon(Icons.person),
+                            ),
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            comment['username'],
+                            style: kSemiBoldTextStyle.copyWith(fontSize: 16),
+                          ),
+                          Text(
+                            comment['createdAt'].toDate().toString(),
+                            style: kSemiBoldTextStyle,
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          Text(
+                            comment['content'],
+                            style: kMediumTextStyle,
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 );
