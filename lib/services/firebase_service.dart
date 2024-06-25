@@ -66,15 +66,20 @@ class PostService {
     return await ref.getDownloadURL();
   }
 
-  Stream<QuerySnapshot> getPosts(int limit, DocumentSnapshot? lastDocument) {
-    Query query = _firestore
+  Stream<QuerySnapshot> getPosts(int limit) {
+    return _firestore
         .collection('posts')
         .orderBy('createdAt', descending: true)
-        .limit(limit);
-    if (lastDocument != null) {
-      query = query.startAfterDocument(lastDocument);
-    }
-    return query.snapshots();
+        .limit(limit)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> searchPosts(String query) {
+    return _firestore
+        .collection('posts')
+        .where('content', isGreaterThanOrEqualTo: query)
+        .where('content', isLessThanOrEqualTo: '$query\uf8ff')
+        .snapshots();
   }
 
   Future<DocumentSnapshot> getUser(String userId) async {
@@ -98,12 +103,41 @@ class PostService {
         .snapshots();
   }
 
-  Future<void> likePost(String postId) async {
-    await _firestore.collection('likes').add({
-      'postId': postId,
-      'userId': _auth.currentUser?.uid,
-      'createdAt': Timestamp.now(),
-    });
+  Future<int> getCommentsCount(String postId) async {
+    final commentsSnapshot = await _firestore
+        .collection('comments')
+        .where('postId', isEqualTo: postId)
+        .get();
+    return commentsSnapshot.size;
+  }
+
+  Future<bool> likePost(String postId) async {
+    // Get the current user's UID
+    String? userId = _auth.currentUser?.uid;
+
+    // Check if the user already liked this post
+    QuerySnapshot query = await _firestore
+        .collection('likes')
+        .where('postId', isEqualTo: postId)
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    // If the user already liked the post, unlike it
+    if (query.docs.isNotEmpty) {
+      // Get the document ID of the like
+      String likeId = query.docs.first.id;
+      // Delete the like document
+      await _firestore.collection('likes').doc(likeId).delete();
+      return false;
+    } else {
+      // If the user hasn't liked the post yet, like it
+      await _firestore.collection('likes').add({
+        'postId': postId,
+        'userId': userId,
+        'createdAt': Timestamp.now(),
+      });
+      return true;
+    }
   }
 
   Future<int> getLikesCount(String postId) async {

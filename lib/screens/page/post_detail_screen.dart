@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evolphy/components/back_appbar.dart';
+import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   final PostService _firebaseService = PostService();
   final TextEditingController _commentController = TextEditingController();
   bool _isLoadingMore = false;
+  int _likes = 0;
   final List<Map<String, dynamic>> _comments = [];
 
   @override
@@ -28,7 +30,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     setState(() {
       _isLoadingMore = true;
     });
-
+    _likes = await _firebaseService.getLikesCount(widget.post['postId']);
     final stream = _firebaseService.getComments(widget.post['postId']);
     stream.listen((QuerySnapshot snapshot) async {
       if (snapshot.docs.isNotEmpty) {
@@ -66,7 +68,90 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     return Scaffold(
       body: Column(
         children: [
-          const BackAppBar(title: 'Detail Forum'),
+          const BackAppBar(
+            title: 'Detail Forum',
+            isPassing: true,
+          ),
+          Container(
+            padding: const EdgeInsets.all(24),
+            color: kAbuHitam,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    widget.post['userImage'] != null
+                        ? CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(widget.post['userImage']),
+                          )
+                        : const CircleAvatar(
+                            backgroundColor: kUngu,
+                            child: Icon(Icons.person),
+                          ),
+                    const SizedBox(
+                      width: 12,
+                    ),
+                    Text(
+                      widget.post['username'],
+                      style: kSemiBoldTextStyle.copyWith(fontSize: 16),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  widget.post['content'],
+                  style: kMediumTextStyle,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                (widget.post['image_url'] != "")
+                    ? MyNetworkImage(imageURL: widget.post['image_url'])
+                    : const SizedBox(),
+                SizedBox(
+                  height: (widget.post['image_url'] != "") ? 20 : 0,
+                ),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  width: double.infinity,
+                  height: 1,
+                  color: kAbu,
+                ),
+                Row(
+                  children: [
+                    const Spacer(),
+                    const Icon(
+                      Icons.favorite_outline,
+                      color: kWhite,
+                    ),
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Text(
+                      '$_likes',
+                      style: kSemiBoldTextStyle,
+                    ),
+                    const Spacer(),
+                    const Icon(
+                      Icons.question_answer_outlined,
+                      color: kWhite,
+                    ),
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Text(
+                      '${_comments.length}',
+                      style: kSemiBoldTextStyle,
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: _comments.length,
@@ -88,32 +173,49 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: const InputDecoration(
-                      labelText: 'Add a comment',
-                      border: OutlineInputBorder(),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                    focusColor: kUngu,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 30.0, vertical: 20),
+                    iconColor: kWhite,
+                    suffixIcon: GestureDetector(
+                        onTap: () async {
+                          final content = _commentController.text;
+                          if (content.isNotEmpty) {
+                            await _firebaseService.createComment(
+                                widget.post['postId'], content);
+                            _commentController.clear();
+                            _comments.clear();
+                            _loadComments();
+                            setState(() {}); // Ensure the UI is refreshed
+                          }
+                        },
+                        child: Container(
+                            margin: const EdgeInsets.only(right: 7),
+                            decoration: const BoxDecoration(
+                                color: kUngu, shape: BoxShape.circle),
+                            child: const Icon(
+                              Icons.send,
+                              color: kWhite,
+                            ))),
+                    filled: true,
+                    fillColor: kAbuHitam,
+                    hintStyle: const TextStyle(color: kAbu),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40),
+                      borderSide: const BorderSide(
+                        width: 0,
+                        style: BorderStyle.none,
+                      ),
                     ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () async {
-                    final content = _commentController.text;
-                    if (content.isNotEmpty) {
-                      await _firebaseService.createComment(
-                          widget.post['postId'], content);
-                      _commentController.clear();
-                      setState(() {}); // Ensure the UI is refreshed
-                    }
-                  },
-                ),
-              ],
+                    hintText: 'Tuliskan komentar yang baik...'),
+              ),
             ),
           ),
         ],

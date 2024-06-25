@@ -15,7 +15,6 @@ class _ForumPageState extends State<ForumPage> {
   final PostService _firebaseService = PostService();
   final int _limitIncrement = 4;
   int _limit = 4;
-  DocumentSnapshot? _lastDocument;
   bool _isLoadingMore = false;
   final List<Map<String, dynamic>> _posts = [];
   final ScrollController _scrollController = ScrollController();
@@ -47,36 +46,46 @@ class _ForumPageState extends State<ForumPage> {
       _isLoadingMore = true;
     });
 
-    final stream = _firebaseService.getPosts(_limit, _lastDocument);
-    stream.listen((QuerySnapshot snapshot) async {
-      if (snapshot.docs.isNotEmpty) {
-        List<Map<String, dynamic>> newPosts = [];
+    try {
+      final stream = _firebaseService.getPosts(_limit);
+      stream.listen((QuerySnapshot snapshot) async {
+        if (snapshot.docs.isNotEmpty) {
+          List<Map<String, dynamic>> newPosts = [];
 
-        for (var doc in snapshot.docs) {
-          DocumentSnapshot userDoc =
-              await _firebaseService.getUser(doc['createdBy']);
-          Map<String, dynamic> postData = doc.data() as Map<String, dynamic>;
-          Map<String, dynamic> userData =
-              userDoc.data() as Map<String, dynamic>;
+          for (var doc in snapshot.docs) {
+            DocumentSnapshot userDoc =
+                await _firebaseService.getUser(doc['createdBy']);
+            Map<String, dynamic> postData = doc.data() as Map<String, dynamic>;
+            Map<String, dynamic> userData =
+                userDoc.data() as Map<String, dynamic>;
 
-          postData['userImage'] = userData['image'];
-          postData['username'] = userData['username'];
-          postData['postId'] = doc.id; // Adding postId to the post data
+            postData['userImage'] = userData['image'];
+            postData['username'] = userData['username'];
+            postData['postId'] = doc.id; // Adding postId to the post data
+            postData['likes'] =
+                await _firebaseService.getLikesCount(postData['postId']);
+            postData['comments'] =
+                await _firebaseService.getCommentsCount(postData['postId']);
 
-          newPosts.add(postData);
+            newPosts.add(postData);
+          }
+
+          setState(() {
+            _posts.addAll(newPosts);
+            _isLoadingMore = false;
+          });
+        } else {
+          setState(() {
+            _isLoadingMore = false;
+          });
         }
-
-        setState(() {
-          _posts.addAll(newPosts);
-          _lastDocument = snapshot.docs.last;
-          _isLoadingMore = false;
-        });
-      } else {
-        setState(() {
-          _isLoadingMore = false;
-        });
-      }
-    });
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingMore = false;
+      });
+      print("Error loading posts: $e");
+    }
   }
 
   Future<void> _loadMorePosts() async {
@@ -89,13 +98,75 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
-  void _navigateAndDisplayResult(BuildContext context) async {
+  Future<void> _searchPosts(String query) async {
+    setState(() {
+      _isLoadingMore = true;
+      _posts.clear();
+    });
+
+    try {
+      final stream = _firebaseService.searchPosts(query);
+      stream.listen((QuerySnapshot snapshot) async {
+        if (snapshot.docs.isNotEmpty) {
+          List<Map<String, dynamic>> newPosts = [];
+
+          for (var doc in snapshot.docs) {
+            DocumentSnapshot userDoc =
+                await _firebaseService.getUser(doc['createdBy']);
+            Map<String, dynamic> postData = doc.data() as Map<String, dynamic>;
+            Map<String, dynamic> userData =
+                userDoc.data() as Map<String, dynamic>;
+
+            postData['userImage'] = userData['image'];
+            postData['username'] = userData['username'];
+            postData['postId'] = doc.id; // Adding postId to the post data
+            postData['likes'] =
+                await _firebaseService.getLikesCount(postData['postId']);
+            postData['comments'] =
+                await _firebaseService.getCommentsCount(postData['postId']);
+
+            newPosts.add(postData);
+          }
+
+          setState(() {
+            _posts.addAll(newPosts);
+            _isLoadingMore = false;
+          });
+        } else {
+          setState(() {
+            _isLoadingMore = false;
+          });
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingMore = false;
+      });
+      print("Error loading posts: $e");
+    }
+  }
+
+  void _navigatePost(BuildContext context) async {
     final result = await Navigator.pushNamed(context, '/post');
 
     // Check what was returned and act accordingly
     if (result != null) {
-      _posts.removeRange(0, _posts.length - 1);
-      await _loadPosts();
+      _posts.clear(); // Clear the existing posts
+      await _loadPosts(); // Reload the posts
+      setState(() {});
+    }
+  }
+
+  void _navigateForum(BuildContext context, Map<String, dynamic> post) async {
+    final result =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return PostDetailScreen(post);
+    }));
+
+    // Check what was returned and act accordingly
+    if (result != null) {
+      _posts.clear(); // Clear the existing posts
+      await _loadPosts(); // Reload the posts
       setState(() {});
     }
   }
@@ -126,21 +197,30 @@ class _ForumPageState extends State<ForumPage> {
                   children: [
                     Expanded(
                       child: TextField(
-                          decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.search),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 30.0, vertical: 15),
-                              filled: true,
-                              fillColor: kAbuHitam,
-                              hintStyle: const TextStyle(color: kAbu),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                  width: 0,
-                                  style: BorderStyle.none,
-                                ),
+                        decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.search),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 30.0, vertical: 15),
+                            filled: true,
+                            fillColor: kAbuHitam,
+                            hintStyle: const TextStyle(color: kAbu),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
                               ),
-                              hintText: 'Cari forum')),
+                            ),
+                            hintText: 'Cari forum'),
+                        onChanged: (value) async {
+                          if (value.isEmpty) {
+                            _posts.clear();
+                            await _loadPosts();
+                          } else {
+                            await _searchPosts(value);
+                          }
+                        },
+                      ),
                     ),
                     const SizedBox(
                       width: 15,
@@ -167,12 +247,10 @@ class _ForumPageState extends State<ForumPage> {
                     itemCount: _posts.length,
                     itemBuilder: (context, index) {
                       final post = _posts[index];
+                      bool like = false;
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return PostDetailScreen(post);
-                          }));
+                          _navigateForum(context, post);
                         },
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 20),
@@ -221,26 +299,48 @@ class _ForumPageState extends State<ForumPage> {
                               SizedBox(
                                 height: (post['image_url'] != "") ? 20 : 0,
                               ),
-                              const Row(
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 20),
+                                width: double.infinity,
+                                height: 1,
+                                color: kAbu,
+                              ),
+                              Row(
                                 children: [
-                                  Icon(
-                                    Icons.favorite_outline,
-                                    color: kWhite,
+                                  const Spacer(),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      _loadPosts();
+                                      like = true;
+                                      setState(() {});
+                                    },
+                                    child: Icon(
+                                      Icons.favorite_outline,
+                                      color: like ? kRed : kWhite,
+                                    ),
                                   ),
-                                  SizedBox(
-                                    width: 7,
+                                  const SizedBox(
+                                    width: 16,
                                   ),
-                                  Icon(
+                                  Text(
+                                    post['likes']
+                                        .toString(), // Convert to string
+                                    style: kSemiBoldTextStyle,
+                                  ),
+                                  const Spacer(),
+                                  const Icon(
                                     Icons.question_answer_outlined,
                                     color: kWhite,
                                   ),
-                                  SizedBox(
-                                    width: 7,
+                                  const SizedBox(
+                                    width: 16,
                                   ),
-                                  Icon(
-                                    Icons.bookmark_border,
-                                    color: kWhite,
-                                  )
+                                  Text(
+                                    post['comments']
+                                        .toString(), // Convert to string
+                                    style: kSemiBoldTextStyle,
+                                  ),
+                                  const Spacer(),
                                 ],
                               ),
                             ],
@@ -260,7 +360,7 @@ class _ForumPageState extends State<ForumPage> {
       ),
       floatingActionButton: GestureDetector(
         onTap: () {
-          _navigateAndDisplayResult(context);
+          _navigatePost(context);
         },
         child: Container(
           padding: const EdgeInsets.all(12),

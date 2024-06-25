@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 class BackAppBar extends StatelessWidget {
   final String? title;
+  final bool? isPassing;
   final bool? save;
   const BackAppBar({
     super.key,
     this.title,
+    this.isPassing,
     this.save,
   });
 
@@ -27,7 +29,9 @@ class BackAppBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
                     onTap: () {
-                      Navigator.pop(context);
+                      isPassing ?? false
+                          ? Navigator.pop(context, 'update')
+                          : Navigator.pop(context);
                     },
                     child: const SizedBox(
                       width: 50,
