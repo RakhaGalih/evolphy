@@ -4,9 +4,9 @@ import 'package:evolphy/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 
 class PostDetailScreen extends StatefulWidget {
-  final String postId;
+  final Map<String, dynamic> post;
 
-  const PostDetailScreen(this.postId, {super.key});
+  const PostDetailScreen(this.post, {super.key});
 
   @override
   _PostDetailScreenState createState() => _PostDetailScreenState();
@@ -15,33 +15,13 @@ class PostDetailScreen extends StatefulWidget {
 class _PostDetailScreenState extends State<PostDetailScreen> {
   final PostService _firebaseService = PostService();
   final TextEditingController _commentController = TextEditingController();
-  final int _limitIncrement = 4;
-  int _limit = 4;
-  DocumentSnapshot? _lastDocument;
   bool _isLoadingMore = false;
   final List<Map<String, dynamic>> _comments = [];
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _loadComments();
-    _scrollController.addListener(_scrollListener);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_scrollListener);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollListener() {
-    if (_scrollController.position.atEdge) {
-      if (_scrollController.position.pixels != 0) {
-        _loadMoreComments();
-      }
-    }
   }
 
   Future<void> _loadComments() async {
@@ -49,9 +29,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       _isLoadingMore = true;
     });
 
-    final stream = _firebaseService.getComments(
-      widget.postId,
-    );
+    final stream = _firebaseService.getComments(widget.post['postId']);
     stream.listen((QuerySnapshot snapshot) async {
       if (snapshot.docs.isNotEmpty) {
         List<Map<String, dynamic>> newComments = [];
@@ -73,7 +51,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
         setState(() {
           _comments.addAll(newComments);
-          _lastDocument = snapshot.docs.last;
           _isLoadingMore = false;
         });
       } else {
@@ -84,16 +61,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     });
   }
 
-  Future<void> _loadMoreComments() async {
-    if (!_isLoadingMore) {
-      setState(() {
-        _isLoadingMore = true;
-        _limit += _limitIncrement;
-      });
-      _loadComments();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +69,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           const BackAppBar(title: 'Detail Forum'),
           Expanded(
             child: ListView.builder(
-              controller: _scrollController,
               itemCount: _comments.length,
               itemBuilder: (context, index) {
                 final comment = _comments[index];
@@ -141,7 +107,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     final content = _commentController.text;
                     if (content.isNotEmpty) {
                       await _firebaseService.createComment(
-                          widget.postId, content);
+                          widget.post['postId'], content);
                       _commentController.clear();
                       setState(() {}); // Ensure the UI is refreshed
                     }

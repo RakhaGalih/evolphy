@@ -17,8 +17,8 @@ class _ForumPageState extends State<ForumPage> {
   int _limit = 4;
   DocumentSnapshot? _lastDocument;
   bool _isLoadingMore = false;
-  List<Map<String, dynamic>> _posts = [];
-  ScrollController _scrollController = ScrollController();
+  final List<Map<String, dynamic>> _posts = [];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -171,7 +171,7 @@ class _ForumPageState extends State<ForumPage> {
                         onTap: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
-                            return PostDetailScreen(post['postId']);
+                            return PostDetailScreen(post);
                           }));
                         },
                         child: Container(
