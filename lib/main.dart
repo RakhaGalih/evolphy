@@ -5,6 +5,7 @@ import 'package:evolphy/screens/auth/sign_in.dart';
 import 'package:evolphy/screens/home/home.dart';
 import 'package:evolphy/screens/page/edit_profil.dart';
 import 'package:evolphy/screens/page/materi_page.dart';
+import 'package:evolphy/screens/page/post_detail_screen.dart';
 import 'package:evolphy/screens/page/post_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ class MainApp extends StatelessWidget {
           '/home': (context) => const Home(),
           '/materi': (context) => const MateriPage(),
           '/post': (context) => const PostPage(),
-          '/edit': (context) => const EditProfile()
+          '/edit': (context) => const EditProfile(),
         },
         theme: ThemeData(
             primaryTextTheme: Typography().white,

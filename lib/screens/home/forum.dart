@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/screens/page/post_detail_screen.dart';
 import 'package:evolphy/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 
@@ -16,8 +17,8 @@ class _ForumPageState extends State<ForumPage> {
   int _limit = 4;
   DocumentSnapshot? _lastDocument;
   bool _isLoadingMore = false;
-  final List<Map<String, dynamic>> _posts = [];
-  final ScrollController _scrollController = ScrollController();
+  List<Map<String, dynamic>> _posts = [];
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -60,6 +61,7 @@ class _ForumPageState extends State<ForumPage> {
 
           postData['userImage'] = userData['image'];
           postData['username'] = userData['username'];
+          postData['postId'] = doc.id; // Adding postId to the post data
 
           newPosts.add(postData);
         }
@@ -160,80 +162,89 @@ class _ForumPageState extends State<ForumPage> {
               ),
               Expanded(
                 child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
                     controller: _scrollController,
                     itemCount: _posts.length,
                     itemBuilder: (context, index) {
                       final post = _posts[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                            color: kAbuHitam,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: kAbu, width: 0.5)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                post['userImage'] != null
-                                    ? CircleAvatar(
-                                        backgroundImage:
-                                            NetworkImage(post['userImage']),
-                                      )
-                                    : const CircleAvatar(
-                                        backgroundColor: kUngu,
-                                        child: Icon(Icons.person),
-                                      ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                Text(
-                                  post['username'],
-                                  style:
-                                      kSemiBoldTextStyle.copyWith(fontSize: 16),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Text(
-                              post['content'],
-                              style: kMediumTextStyle,
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            (post['image_url'] != "")
-                                ? MyNetworkImage(imageURL: post['image_url'])
-                                : const SizedBox(),
-                            SizedBox(
-                              height: (post['image_url'] != "") ? 20 : 0,
-                            ),
-                            const Row(
-                              children: [
-                                Icon(
-                                  Icons.favorite_outline,
-                                  color: kWhite,
-                                ),
-                                SizedBox(
-                                  width: 7,
-                                ),
-                                Icon(
-                                  Icons.question_answer_outlined,
-                                  color: kWhite,
-                                ),
-                                SizedBox(
-                                  width: 7,
-                                ),
-                                Icon(
-                                  Icons.bookmark_border,
-                                  color: kWhite,
-                                )
-                              ],
-                            ),
-                          ],
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return PostDetailScreen(post['postId']);
+                          }));
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              color: kAbuHitam,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: kAbu, width: 0.5)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  post['userImage'] != null
+                                      ? CircleAvatar(
+                                          backgroundImage:
+                                              NetworkImage(post['userImage']),
+                                        )
+                                      : const CircleAvatar(
+                                          backgroundColor: kUngu,
+                                          child: Icon(Icons.person),
+                                        ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  Text(
+                                    post['username'],
+                                    style: kSemiBoldTextStyle.copyWith(
+                                        fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Text(
+                                post['content'],
+                                style: kMediumTextStyle,
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              (post['image_url'] != "")
+                                  ? MyNetworkImage(imageURL: post['image_url'])
+                                  : const SizedBox(),
+                              SizedBox(
+                                height: (post['image_url'] != "") ? 20 : 0,
+                              ),
+                              const Row(
+                                children: [
+                                  Icon(
+                                    Icons.favorite_outline,
+                                    color: kWhite,
+                                  ),
+                                  SizedBox(
+                                    width: 7,
+                                  ),
+                                  Icon(
+                                    Icons.question_answer_outlined,
+                                    color: kWhite,
+                                  ),
+                                  SizedBox(
+                                    width: 7,
+                                  ),
+                                  Icon(
+                                    Icons.bookmark_border,
+                                    color: kWhite,
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }),
