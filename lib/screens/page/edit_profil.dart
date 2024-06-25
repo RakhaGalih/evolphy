@@ -81,14 +81,15 @@ class _EditProfileState extends State<EditProfile> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(60),
                             child: CircleAvatar(
-                              radius: 60,
-                              backgroundColor: kAbuHitam,
-                              child: networkImage(
-                                  _image ??
+                                radius: 60,
+                                backgroundColor: kAbuHitam,
+                                child: MyNetworkImage(
+                                  imageURL: _image ??
                                       'https://firebasestorage.googleapis.com/v0/b/evolphy-cfb2e.appspot.com/o/Rectangle%206.png?alt=media&token=2b96ff1a-6c58-478d-8c4d-482cf3ba02ef',
-                                  120,
-                                  120),
-                            ),
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                )),
                           ),
                           Align(
                             alignment: Alignment.bottomRight,

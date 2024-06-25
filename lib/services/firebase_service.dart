@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,16 +35,83 @@ class AuthService {
   }
 }
 
-Future<void> createDocument(String collectionName, String documentName,
-    Map<String, dynamic> data) async {
-  try {
-    await FirebaseFirestore.instance
-        .collection(collectionName)
-        .doc(documentName)
-        .set(data);
-    print("Dokumen berhasil dibuat!");
-  } catch (e) {
-    print("Error menambahkan dokumen: $e");
+class PostService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  Future<void> createPost(String content, File? imageFile) async {
+    if (imageFile != null) {
+      String imageUrl = await _uploadImage(imageFile);
+      await _firestore.collection('posts').add({
+        'content': content,
+        'image_url': imageUrl,
+        'createdAt': Timestamp.now(),
+        'createdBy': _auth.currentUser?.uid,
+      });
+    } else {
+      await _firestore.collection('posts').add({
+        'content': content,
+        'image_url': "",
+        'createdAt': Timestamp.now(),
+        'createdBy': _auth.currentUser?.uid,
+      });
+    }
+  }
+
+  Future<String> _uploadImage(File imageFile) async {
+    String fileName = imageFile.path.split('/').last;
+    Reference ref = _storage.ref().child('post_images/$fileName');
+    await ref.putFile(imageFile);
+    return await ref.getDownloadURL();
+  }
+
+  Stream<QuerySnapshot> getPosts(int limit, DocumentSnapshot? lastDocument) {
+    Query query = _firestore
+        .collection('posts')
+        .orderBy('createdAt', descending: true)
+        .limit(limit);
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument);
+    }
+    return query.snapshots();
+  }
+
+  Future<DocumentSnapshot> getUser(String userId) async {
+    return await _firestore.collection('users').doc(userId).get();
+  }
+
+  Future<void> createComment(String postId, String content) async {
+    await _firestore.collection('comments').add({
+      'postId': postId,
+      'content': content,
+      'createdAt': Timestamp.now(),
+      'createdBy': _auth.currentUser?.uid,
+    });
+  }
+
+  Stream<QuerySnapshot> getComments(String postId) {
+    return _firestore
+        .collection('comments')
+        .where('postId', isEqualTo: postId)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+  }
+
+  Future<void> likePost(String postId) async {
+    await _firestore.collection('likes').add({
+      'postId': postId,
+      'userId': _auth.currentUser?.uid,
+      'createdAt': Timestamp.now(),
+    });
+  }
+
+  Future<int> getLikesCount(String postId) async {
+    final likesSnapshot = await _firestore
+        .collection('likes')
+        .where('postId', isEqualTo: postId)
+        .get();
+    return likesSnapshot.size;
   }
 }
 
@@ -129,17 +197,6 @@ Future<void> updateProperty(
   }
 }
 
-Future<void> checkAndHandleDocument(String collectionName, String documentName,
-    Map<String, dynamic> data) async {
-  bool exists = await checkDocumentExists(collectionName, documentName);
-
-  if (exists) {
-    await readDocument(collectionName, documentName);
-  } else {
-    await createDocument(collectionName, documentName, data);
-  }
-}
-
 Future<void> logOut(BuildContext context) async {
   try {
     await FirebaseAuth.instance.signOut();
@@ -182,30 +239,46 @@ Future<void> pickAndUploadImage(
   }
 }
 
-Image networkImage(String imageURL, double width, double height) {
-  return Image.network(imageURL,
-      width: width,
-      height: height,
-      fit: BoxFit.cover, loadingBuilder: (BuildContext context, Widget child,
-          ImageChunkEvent? loadingProgress) {
-    if (loadingProgress == null) {
-      return child;
-    } else {
-      return Center(
-        child: CircularProgressIndicator(
-          color: kUngu,
-          value: loadingProgress.expectedTotalBytes != null
-              ? loadingProgress.cumulativeBytesLoaded /
-                  (loadingProgress.expectedTotalBytes ?? 1)
-              : null,
-        ),
-      );
-    }
-  }, errorBuilder:
-          (BuildContext context, Object exception, StackTrace? stackTrace) {
-    return SizedBox(
-        width: width,
-        height: height,
-        child: const Text('Failed to load image'));
+class MyNetworkImage extends StatelessWidget {
+  final String imageURL;
+  final double? width;
+  final double? height;
+  final BoxFit? fit;
+  const MyNetworkImage({
+    super.key,
+    required this.imageURL,
+    this.width,
+    this.height,
+    this.fit,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(imageURL, width: width, height: height, fit: fit,
+        loadingBuilder: (BuildContext context, Widget child,
+            ImageChunkEvent? loadingProgress) {
+      if (loadingProgress == null) {
+        return child;
+      } else {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: CircularProgressIndicator(
+              color: kUngu,
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      (loadingProgress.expectedTotalBytes ?? 1)
+                  : null,
+            ),
+          ),
+        );
+      }
+    }, errorBuilder:
+            (BuildContext context, Object exception, StackTrace? stackTrace) {
+      return SizedBox(
+          width: width,
+          height: height,
+          child: const Text('Failed to load image'));
+    });
+  }
 }

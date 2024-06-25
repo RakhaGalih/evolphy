@@ -48,18 +48,25 @@ class _SoalPageState extends State<SoalPage> {
                   borderRadius: BorderRadius.circular(10)),
               child: Row(children: [
                 for (int i = 0; i < listSoal.length; i++)
-                  widget.isPembahasan
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: SoalCircleFloat(
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedIndex = i;
+                      });
+                    },
+                    child: widget.isPembahasan
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: SoalCircleFloat(
+                              no: i + 1,
+                              isTrue: kebenaranSoal[i],
+                            ),
+                          )
+                        : SoalCircle(
                             no: i + 1,
-                            isTrue: kebenaranSoal[i],
+                            isDone: listSoal[i].controller.text.isNotEmpty,
                           ),
-                        )
-                      : SoalCircle(
-                          no: i + 1,
-                          isDone: listSoal[i].controller.text.isNotEmpty,
-                        )
+                  )
               ]),
             ),
           ),
