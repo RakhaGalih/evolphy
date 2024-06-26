@@ -111,41 +111,60 @@ class PostService {
     return commentsSnapshot.size;
   }
 
-  Future<bool> likePost(String postId) async {
-    // Get the current user's UID
-    String? userId = _auth.currentUser?.uid;
-
-    // Check if the user already liked this post
-    QuerySnapshot query = await _firestore
-        .collection('likes')
-        .where('postId', isEqualTo: postId)
-        .where('userId', isEqualTo: userId)
-        .get();
-
-    // If the user already liked the post, unlike it
-    if (query.docs.isNotEmpty) {
-      // Get the document ID of the like
-      String likeId = query.docs.first.id;
-      // Delete the like document
-      await _firestore.collection('likes').doc(likeId).delete();
-      return false;
-    } else {
-      // If the user hasn't liked the post yet, like it
+  Future<void> likePost(String postId) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
       await _firestore.collection('likes').add({
         'postId': postId,
-        'userId': userId,
+        'userId': user.uid,
         'createdAt': Timestamp.now(),
       });
-      return true;
     }
   }
 
+  Future<void> unlikePost(String postId) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('likes')
+          .where('postId', isEqualTo: postId)
+          .where('userId', isEqualTo: user.uid)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        await doc.reference.delete();
+      }
+    }
+  }
+
+  Future<bool> isPostLikedByUser(String postId) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('likes')
+          .where('postId', isEqualTo: postId)
+          .where('userId', isEqualTo: user.uid)
+          .get();
+
+      return snapshot.docs.isNotEmpty;
+    }
+    return false;
+  }
+
   Future<int> getLikesCount(String postId) async {
-    final likesSnapshot = await _firestore
+    QuerySnapshot snapshot = await _firestore
         .collection('likes')
         .where('postId', isEqualTo: postId)
         .get();
-    return likesSnapshot.size;
+    return snapshot.docs.length;
+  }
+
+  Future<void> toggleLike(String postId, bool isLiked) async {
+    if (isLiked) {
+      await unlikePost(postId);
+    } else {
+      await likePost(postId);
+    }
   }
 }
 
@@ -243,33 +262,84 @@ Future<void> logOut(BuildContext context) async {
   }
 }
 
-Future<void> pickAndUploadImage(
-    String collection, String docId, String property) async {
-  final FirebaseStorage storage = FirebaseStorage.instance;
-  final ImagePicker picker = ImagePicker();
-  final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+class ImageService {
+  File? selectedImage;
+  final ImagePicker _picker = ImagePicker();
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  if (pickedFile != null) {
-    File file = File(pickedFile.path);
-    try {
-      // Unggah gambar ke Firebase Storage
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final storageRef = storage.ref().child('images/$fileName');
-      UploadTask uploadTask = storageRef.putFile(file);
+  File? getSelectedImage() {
+    return selectedImage;
+  }
 
-      // Tunggu sampai pengunggahan selesai dan dapatkan URL unduhan
-      TaskSnapshot taskSnapshot = await uploadTask;
-      String downloadURL = await taskSnapshot.ref.getDownloadURL();
+  Future<void> pickImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
 
-      // Simpan URL gambar di Firestore
-      await updateProperty(collection, docId, property, downloadURL);
-
-      print("Image uploaded successfully: $downloadURL");
-    } catch (e) {
-      print("Error uploading image: $e");
+    if (pickedFile != null) {
+      selectedImage = File(pickedFile.path);
+    } else {
+      print("No image selected");
     }
-  } else {
-    print("No image selected");
+  }
+
+  Future<void> uploadImage(
+      String collection, String docId, String property) async {
+    if (selectedImage != null) {
+      try {
+        // Unggah gambar ke Firebase Storage
+        String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+        final storageRef = _storage.ref().child('forum/$fileName');
+        UploadTask uploadTask = storageRef.putFile(selectedImage!);
+
+        // Tunggu sampai pengunggahan selesai dan dapatkan URL unduhan
+        TaskSnapshot taskSnapshot = await uploadTask;
+        String downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+        // Simpan URL gambar di Firestore
+        await updateProperty(collection, docId, property, downloadURL);
+
+        print("Image uploaded successfully: $downloadURL");
+      } catch (e) {
+        print("Error uploading image: $e");
+      }
+    } else {
+      print("No image selected for upload");
+    }
+  }
+
+  Future<void> pickAndUploadImage(
+      String collection, String docId, String property) async {
+    final FirebaseStorage storage = FirebaseStorage.instance;
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      File file = File(pickedFile.path);
+      try {
+        // Unggah gambar ke Firebase Storage
+        String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+        final storageRef = storage.ref().child('images/$fileName');
+        UploadTask uploadTask = storageRef.putFile(file);
+
+        // Tunggu sampai pengunggahan selesai dan dapatkan URL unduhan
+        TaskSnapshot taskSnapshot = await uploadTask;
+        String downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+        // Simpan URL gambar di Firestore
+        await updateProperty(collection, docId, property, downloadURL);
+
+        print("Image uploaded successfully: $downloadURL");
+      } catch (e) {
+        print("Error uploading image: $e");
+      }
+    } else {
+      print("No image selected");
+    }
+  }
+
+  void clearImage() {
+    selectedImage = null;
   }
 }
 

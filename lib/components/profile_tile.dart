@@ -17,11 +17,16 @@ class ProfileTile extends StatelessWidget {
             title,
             style: kMediumTextStyle.copyWith(fontSize: 14),
           ),
-          const Spacer(),
-          Text(
-            value ?? '-',
-            style: kRegularTextStyle.copyWith(
-                fontSize: 14, color: Colors.white.withOpacity(0.5)),
+          const SizedBox(
+            width: 40,
+          ),
+          Expanded(
+            child: Text(
+              value ?? '-',
+              textAlign: TextAlign.end,
+              style: kRegularTextStyle.copyWith(
+                  fontSize: 14, color: Colors.white.withOpacity(0.5)),
+            ),
           ),
         ],
       ),

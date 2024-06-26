@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/screens/page/post_detail_screen.dart';
+import 'package:evolphy/services/converter.dart';
 import 'package:evolphy/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 
@@ -66,6 +67,8 @@ class _ForumPageState extends State<ForumPage> {
                 await _firebaseService.getLikesCount(postData['postId']);
             postData['comments'] =
                 await _firebaseService.getCommentsCount(postData['postId']);
+            postData['isLiked'] =
+                await _firebaseService.isPostLikedByUser(postData['postId']);
 
             newPosts.add(postData);
           }
@@ -124,6 +127,8 @@ class _ForumPageState extends State<ForumPage> {
                 await _firebaseService.getLikesCount(postData['postId']);
             postData['comments'] =
                 await _firebaseService.getCommentsCount(postData['postId']);
+            postData['isLiked'] =
+                await _firebaseService.isPostLikedByUser(postData['postId']);
 
             newPosts.add(postData);
           }
@@ -169,6 +174,17 @@ class _ForumPageState extends State<ForumPage> {
       await _loadPosts(); // Reload the posts
       setState(() {});
     }
+  }
+
+  Future<void> _toggleLike(String postId, bool isLiked) async {
+    _firebaseService.toggleLike(postId, isLiked);
+
+    // Refresh posts to reflect the new like status
+    setState(() {
+      _posts.clear();
+      _limit = _limitIncrement;
+    });
+    await _loadPosts();
   }
 
   @override
@@ -276,10 +292,22 @@ class _ForumPageState extends State<ForumPage> {
                                   const SizedBox(
                                     width: 12,
                                   ),
+                                  Expanded(
+                                    child: Text(
+                                      post['username'],
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: kSemiBoldTextStyle.copyWith(
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
                                   Text(
-                                    post['username'],
-                                    style: kSemiBoldTextStyle.copyWith(
-                                        fontSize: 16),
+                                    formatTanggal(post['createdAt']),
+                                    style: kMediumTextStyle.copyWith(
+                                        fontSize: 12, color: kAbuText),
                                   ),
                                 ],
                               ),
@@ -309,14 +337,16 @@ class _ForumPageState extends State<ForumPage> {
                                 children: [
                                   const Spacer(),
                                   GestureDetector(
-                                    onTap: () async {
-                                      _loadPosts();
-                                      like = true;
-                                      setState(() {});
+                                    onTap: () {
+                                      _toggleLike(
+                                          post['postId'], post['isLiked']);
                                     },
                                     child: Icon(
-                                      Icons.favorite_outline,
-                                      color: like ? kRed : kWhite,
+                                      post['isLiked']
+                                          ? Icons.favorite
+                                          : Icons.favorite_outline,
+                                      color:
+                                          post['isLiked'] ? Colors.red : kWhite,
                                     ),
                                   ),
                                   const SizedBox(

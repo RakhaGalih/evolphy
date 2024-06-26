@@ -1,10 +1,6 @@
-import 'dart:io';
-
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/services/firebase_service.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class PostPage extends StatefulWidget {
@@ -16,49 +12,15 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   bool _showSpinner = false;
-  File? _selectedImage;
   final _formKey = GlobalKey<FormState>();
-  final FirebaseStorage storage = FirebaseStorage.instance;
+  final ImageService _imageService = ImageService();
   final PostService _firebaseService = PostService();
-  final ImagePicker picker = ImagePicker();
   final TextEditingController _contentController = TextEditingController();
 
-  Future<void> pickImage() async {
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    } else {
-      print("No image selected");
-    }
-  }
-
-  Future<void> uploadImage(
-      String collection, String docId, String property) async {
-    if (_selectedImage != null) {
-      try {
-        // Unggah gambar ke Firebase Storage
-        String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-        final storageRef = storage.ref().child('forum/$fileName');
-        UploadTask uploadTask = storageRef.putFile(_selectedImage!);
-
-        // Tunggu sampai pengunggahan selesai dan dapatkan URL unduhan
-        TaskSnapshot taskSnapshot = await uploadTask;
-        String downloadURL = await taskSnapshot.ref.getDownloadURL();
-
-        // Simpan URL gambar di Firestore
-        await updateProperty(collection, docId, property, downloadURL);
-
-        print("Image uploaded successfully: $downloadURL");
-      } catch (e) {
-        print("Error uploading image: $e");
-      }
-    } else {
-      print("No image selected for upload");
-    }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
   }
 
   void _post() async {
@@ -67,18 +29,12 @@ class _PostPageState extends State<PostPage> {
         _showSpinner = true;
       });
       await _firebaseService.createPost(
-          _contentController.text, _selectedImage);
+          _contentController.text, _imageService.selectedImage);
       Navigator.pop(context, 'update');
       setState(() {
         _showSpinner = false;
       });
     }
-  }
-
-  void _clearImage() {
-    setState(() {
-      _selectedImage = null;
-    });
   }
 
   @override
@@ -158,10 +114,10 @@ class _PostPageState extends State<PostPage> {
                     const SizedBox(
                       height: 20,
                     ),
-                    if (_selectedImage != null)
+                    if (_imageService.selectedImage != null)
                       Stack(
                         children: [
-                          Image.file(_selectedImage!),
+                          Image.file(_imageService.selectedImage!),
                           Align(
                             alignment: Alignment.topRight,
                             child: Container(
@@ -173,7 +129,8 @@ class _PostPageState extends State<PostPage> {
                                   color: kAbuHitam.withOpacity(0.5)),
                               child: GestureDetector(
                                   onTap: () async {
-                                    _clearImage();
+                                    _imageService.clearImage();
+                                    setState(() {});
                                   },
                                   child: const Icon(
                                     Icons.close,
@@ -189,7 +146,8 @@ class _PostPageState extends State<PostPage> {
             ),
             GestureDetector(
               onTap: () async {
-                pickImage();
+                await _imageService.pickImage();
+                setState(() {});
               },
               child: Container(
                 color: kAbuHitam,

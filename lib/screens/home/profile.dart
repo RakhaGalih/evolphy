@@ -27,7 +27,14 @@ class _ProfilePageState extends State<ProfilePage> {
     getDataUser();
   }
 
-  void getDataUser() async {
+  void resetData() {
+    _username = null;
+    _email = null;
+    _telepon = null;
+    _image = null;
+  }
+
+  Future<void> getDataUser() async {
     User? user = await AuthService().getCurrentUser();
     if (user != null) {
       String? fetchedUsername =
@@ -44,14 +51,16 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _navigateAndDisplayResult(BuildContext context) async {
+  Future<void> _navigateAndDisplayResult(BuildContext context) async {
     final result = await Navigator.pushNamed(context, '/edit');
 
     // Check what was returned and act accordingly
     if (result != null) {
-      setState(() {
-        getDataUser();
-      });
+      resetData();
+      await getDataUser();
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -86,6 +95,9 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Text(
               _username ?? 'null',
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: kMediumTextStyle.copyWith(fontSize: 20),
             ),
             Padding(
@@ -101,8 +113,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const Spacer(),
                       GestureDetector(
-                        onTap: () {
-                          _navigateAndDisplayResult(context);
+                        onTap: () async {
+                          await _navigateAndDisplayResult(context);
                         },
                         child: Text('Edit Profil',
                             style: kRegularTextStyle.copyWith(
