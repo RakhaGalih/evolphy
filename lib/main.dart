@@ -2,6 +2,7 @@ import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/data_model.dart';
 import 'package:evolphy/screens/auth/login_page.dart';
 import 'package:evolphy/screens/auth/sign_in.dart';
+import 'package:evolphy/screens/auth/transition.dart';
 import 'package:evolphy/screens/home/home.dart';
 import 'package:evolphy/screens/page/edit_profil.dart';
 import 'package:evolphy/screens/page/materi_page.dart';
@@ -26,8 +27,9 @@ class MainApp extends StatelessWidget {
       create: (_) => DataModel(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: '/login',
+        initialRoute: '/transition',
         routes: {
+          '/transition': (context) => const TransitionScreen(),
           '/login': (context) => const LoginPage(),
           '/signIn': (context) => const SignInPage(),
           '/home': (context) => const Home(),

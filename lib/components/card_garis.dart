@@ -9,8 +9,9 @@ class CardGaris extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: kAbuHitam,
             border: Border.all(color: kAbu),
             borderRadius: BorderRadius.circular(12)),
         child: child);
