@@ -1,10 +1,16 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:evolphy/components/back_appbar.dart';
 import 'package:evolphy/components/materi_icon.dart';
 import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/models/materi_model.dart';
 import 'package:flutter/material.dart';
 
 class MateriPage extends StatelessWidget {
-  const MateriPage({super.key});
+  final ModelJudulMateri materi;
+  const MateriPage({
+    super.key,
+    required this.materi,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +34,14 @@ class MateriPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Kategori Kinematika',
+                    materi.title,
                     style: kSemiBoldTextStyle.copyWith(fontSize: 24),
                   ),
                   const SizedBox(
                     height: 12,
                   ),
                   Text(
-                    'kinematika adalah cabang dari mekanika klasik yang membahas gerak benda dan sistem benda tanpa mempersoalkan gaya penyebab gerakan.',
+                    materi.desc,
                     style: kSemiBoldTextStyle.copyWith(fontSize: 16),
                   ),
                   const SizedBox(
@@ -90,12 +96,13 @@ class MateriPage extends StatelessWidget {
                 const SizedBox(
                   height: 4,
                 ),
-                const MateriCard(
-                    color: kUngu, image: 'listrik.png', title: 'Coba'),
-                const MateriCard(
-                    color: kUngu, image: 'listrik.png', title: 'Coba'),
-                const MateriCard(
-                    color: kUngu, image: 'listrik.png', title: 'Coba')
+                for (int i = 0; i < materi.listMateri.length; i++)
+                  MateriCard(
+                    color: materi.listMateri[i].color,
+                    image: materi.listMateri[i].image,
+                    title: materi.listMateri[i].title,
+                    materi: materi.listMateri[i],
+                  ),
               ],
             ),
           ),

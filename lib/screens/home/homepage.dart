@@ -3,6 +3,7 @@
 import "package:evolphy/constants/constant.dart";
 import "package:evolphy/models/data_model.dart";
 import "package:evolphy/models/materi_model.dart";
+import "package:evolphy/screens/page/materi_page.dart";
 import "package:flutter/material.dart";
 import "package:flutter_svg/svg.dart";
 import "package:provider/provider.dart";
@@ -195,19 +196,22 @@ class _BerandaPage extends State<BerandaPage> {
             height: 236,
             child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: materi.length,
+                itemCount: listJudulMateris.length,
                 clipBehavior: Clip.none,
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/materi');
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return MateriPage(materi: listJudulMateris[index]);
+                      }));
                     },
                     child: Container(
                       width: 165,
                       height: 236,
                       padding: EdgeInsets.all(15),
                       decoration: BoxDecoration(
-                        color: materi[index].color,
+                        color: listJudulMateris[index].color,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Stack(
@@ -234,7 +238,9 @@ class _BerandaPage extends State<BerandaPage> {
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      materi[index].diamond.toString(),
+                                      listJudulMateris[index]
+                                          .diamond
+                                          .toString(),
                                       style: TextStyle(
                                         color: Colors.white,
                                       ),
@@ -243,7 +249,7 @@ class _BerandaPage extends State<BerandaPage> {
                                 ),
                               ),
                               Text(
-                                materi[index].title,
+                                listJudulMateris[index].title,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16),
                               )
@@ -253,7 +259,7 @@ class _BerandaPage extends State<BerandaPage> {
                             right: -15,
                             bottom: 25,
                             child: SvgPicture.asset(
-                              materi[index].image,
+                              listJudulMateris[index].image,
                             ),
                           ),
                         ],

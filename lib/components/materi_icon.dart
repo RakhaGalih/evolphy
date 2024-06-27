@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:evolphy/components/card_garis.dart';
 import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/models/materi_model.dart';
 import 'package:evolphy/screens/page/materi_detail_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -29,11 +30,13 @@ class MateriCard extends StatelessWidget {
   final Color color;
   final String image;
   final String title;
+  final ModelMateri materi;
   const MateriCard({
     super.key,
     required this.color,
     required this.image,
     required this.title,
+    required this.materi,
   });
 
   @override
@@ -43,7 +46,9 @@ class MateriCard extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const DetailMateriPage();
+            return DetailMateriPage(
+              materi: materi,
+            );
           }));
         },
         child: CardGaris(

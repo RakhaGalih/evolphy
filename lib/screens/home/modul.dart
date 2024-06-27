@@ -2,6 +2,7 @@
 
 import "package:evolphy/constants/constant.dart";
 import "package:evolphy/models/materi_model.dart";
+import "package:evolphy/screens/page/materi_page.dart";
 import "package:flutter/material.dart";
 import "package:flutter_svg/svg.dart";
 
@@ -31,7 +32,7 @@ class ModulPage extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: GridView.builder(
-                  itemCount: materi.length,
+                  itemCount: listJudulMateris.length,
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 275,
                       childAspectRatio: 0.7,
@@ -40,13 +41,17 @@ class ModulPage extends StatelessWidget {
                   itemBuilder: (context, index) => Container(
                     padding: EdgeInsets.all(15),
                     decoration: BoxDecoration(
-                      color: materi[index].color,
+                      color: listJudulMateris[index].color,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: LayoutBuilder(builder: (context, constraints) {
                       return GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, '/materi');
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return MateriPage(
+                                materi: listJudulMateris[index]);
+                          }));
                         },
                         child: Stack(
                           clipBehavior: Clip.none,
@@ -72,7 +77,9 @@ class ModulPage extends StatelessWidget {
                                       ),
                                       SizedBox(width: 4),
                                       Text(
-                                        materi[index].diamond.toString(),
+                                        listJudulMateris[index]
+                                            .diamond
+                                            .toString(),
                                         style: TextStyle(
                                           color: Colors.white,
                                         ),
@@ -81,7 +88,7 @@ class ModulPage extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  materi[index].title,
+                                  listJudulMateris[index].title,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: constraints.maxWidth * 0.12,
@@ -93,7 +100,7 @@ class ModulPage extends StatelessWidget {
                               right: -15,
                               bottom: constraints.maxWidth * 0.25,
                               child: SvgPicture.asset(
-                                materi[index].image,
+                                listJudulMateris[index].image,
                                 width: constraints.maxWidth,
                               ),
                             ),

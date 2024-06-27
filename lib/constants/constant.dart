@@ -12,6 +12,11 @@ const kGreySecondary = Color(0xFFB0B0B0);
 const kGrey = Color(0xFF40444C);
 const kBG = Color(0xFF1C202A);
 const kRed = Color(0xFFFF7070);
+const kOrange = Color(0xFFFF8C82);
+const kPink = Color(0xFFF28FE6);
+const kPurple = Color(0xFF9187FF);
+const kBlue = Color(0xFF7BB2FB);
+const kYellow = Color(0xFFF8FB7B);
 
 const kTitleTextStyle = TextStyle(fontWeight: FontWeight.w500, fontSize: 28);
 const kLightTextStyle = TextStyle(fontWeight: FontWeight.w300);

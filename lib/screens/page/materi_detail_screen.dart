@@ -1,8 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
 import 'package:evolphy/components/back_appbar.dart';
 import 'package:evolphy/components/card_garis.dart';
 import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/models/materi_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -10,7 +12,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class DetailMateriPage extends StatefulWidget {
-  const DetailMateriPage({super.key});
+  final ModelMateri materi;
+  const DetailMateriPage({
+    super.key,
+    required this.materi,
+  });
 
   @override
   State<DetailMateriPage> createState() => _DetailMateriPageState();
@@ -23,16 +29,6 @@ class _DetailMateriPageState extends State<DetailMateriPage>
   int _selectedIndexVideo = 0;
   bool _viewFullPage = false;
   File? _file;
-  List<String> listVideo = [
-    "https://www.youtube.com/watch?v=lt4bRdWowGI",
-    "https://www.youtube.com/watch?v=-l6Th8W0-iU",
-    "https://www.youtube.com/watch?v=4Y_nHzSOm1c",
-    "https://www.youtube.com/watch?v=MNtAXylJb7Q",
-    "https://www.youtube.com/watch?v=WDAaUBWZIaI",
-    "https://www.youtube.com/watch?v=YdSySM6nvM0",
-    "https://www.youtube.com/watch?v=Lp62iQwES38",
-    "https://www.youtube.com/watch?v=iHJI66Mqfjs"
-  ];
 
   String videoId = "";
 
@@ -52,8 +48,9 @@ class _DetailMateriPageState extends State<DetailMateriPage>
   }
 
   void updateVideo() {
-    videoId =
-        YoutubePlayer.convertUrlToId(listVideo[_selectedIndexVideo]) ?? "";
+    videoId = YoutubePlayer.convertUrlToId(
+            widget.materi.listYoutube[_selectedIndexVideo].link) ??
+        "";
     _controller = YoutubePlayerController(
       initialVideoId: videoId,
       flags: const YoutubePlayerFlags(
@@ -65,9 +62,9 @@ class _DetailMateriPageState extends State<DetailMateriPage>
   }
 
   Future<void> getFile() async {
-    final bytes = await rootBundle.load('pdfs/gerak_lurus.pdf');
+    final bytes = await rootBundle.load('pdfs${widget.materi.pdf}');
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/gerak_lurus.pdf');
+    final file = File('${dir.path}${widget.materi.pdf}');
     await file.writeAsBytes(bytes.buffer.asUint8List());
     setState(() {
       _file = file;
@@ -77,7 +74,9 @@ class _DetailMateriPageState extends State<DetailMateriPage>
   void changeVideo(int index) {
     setState(() {
       _selectedIndexVideo = index;
-      _controller.load(YoutubePlayer.convertUrlToId(listVideo[index]) ?? "");
+      _controller.load(
+          YoutubePlayer.convertUrlToId(widget.materi.listYoutube[index].link) ??
+              "");
     });
   }
 
@@ -151,13 +150,16 @@ class _DetailMateriPageState extends State<DetailMateriPage>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Gerak Lurus',
+                            widget.materi.title,
                             style: kSemiBoldTextStyle.copyWith(fontSize: 20),
                           ),
+                          const SizedBox(
+                            height: 4,
+                          ),
                           Text(
-                            'Materi ini menjelaskan tentang ',
+                            'Materi ini menjelaskan tentang ${widget.materi.title}',
                             style: kRegularTextStyle.copyWith(
-                                fontSize: 16, color: kAbuText),
+                                fontSize: 14, color: kAbuText),
                           ),
                           const SizedBox(
                             height: 15,
@@ -223,7 +225,9 @@ class _DetailMateriPageState extends State<DetailMateriPage>
                                   style:
                                       kSemiBoldTextStyle.copyWith(fontSize: 16),
                                 ),
-                                for (int i = 0; i < listVideo.length; i++)
+                                for (int i = 0;
+                                    i < widget.materi.listYoutube.length;
+                                    i++)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 12),
                                     child: GestureDetector(
@@ -237,13 +241,21 @@ class _DetailMateriPageState extends State<DetailMateriPage>
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 8, vertical: 4),
                                             decoration: BoxDecoration(
-                                                color: kUngu,
+                                                color: (i ==
+                                                        _selectedIndexVideo)
+                                                    ? kUngu
+                                                    : kUngu.withOpacity(0.5),
                                                 borderRadius:
                                                     BorderRadius.circular(4)),
                                             child: Text(
                                               'Part ${i + 1}',
-                                              style: kSemiBoldTextStyle
-                                                  .copyWith(fontSize: 12),
+                                              style: kSemiBoldTextStyle.copyWith(
+                                                  fontSize: 12,
+                                                  color: (i ==
+                                                          _selectedIndexVideo)
+                                                      ? kWhite
+                                                      : kWhite
+                                                          .withOpacity(0.5)),
                                             ),
                                           ),
                                           const SizedBox(
@@ -251,9 +263,15 @@ class _DetailMateriPageState extends State<DetailMateriPage>
                                           ),
                                           Expanded(
                                             child: Text(
-                                              'Gerak Lurus Beraturan (GLB) dan Gerak Lurus Berubah Beraturan (GLBB)',
+                                              widget
+                                                  .materi.listYoutube[i].title,
                                               style: kRegularTextStyle.copyWith(
-                                                  fontSize: 12),
+                                                  fontSize: 12,
+                                                  color: (i ==
+                                                          _selectedIndexVideo)
+                                                      ? kWhite
+                                                      : kWhite
+                                                          .withOpacity(0.5)),
                                             ),
                                           )
                                         ],
@@ -272,7 +290,7 @@ class _DetailMateriPageState extends State<DetailMateriPage>
                                   height: 8,
                                 ),
                                 Text(
-                                  'Deskripsi Materi',
+                                  widget.materi.desc,
                                   style: kRegularTextStyle.copyWith(
                                       fontSize: 16, color: kAbuText),
                                 ),
@@ -318,7 +336,15 @@ class _DetailMateriPageState extends State<DetailMateriPage>
                                         ),
                                       )))
                                 ]))
-                              : const CircularProgressIndicator(),
+                              : const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(44),
+                                    child: Text(
+                                      'Rangkuman materi ini sedang dalam pengembangan.',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
                         ],
                       ),
                     ),
