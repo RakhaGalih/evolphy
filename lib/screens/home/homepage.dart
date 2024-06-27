@@ -1,12 +1,14 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import "package:evolphy/constants/constant.dart";
-import "package:evolphy/models/data_model.dart";
-import "package:evolphy/models/materi_model.dart";
-import "package:evolphy/screens/page/materi_page.dart";
-import "package:flutter/material.dart";
-import "package:flutter_svg/svg.dart";
-import "package:provider/provider.dart";
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/models/data_model.dart';
+import 'package:evolphy/models/materi_model.dart';
+import 'package:evolphy/screens/page/materi_page.dart';
+import 'package:evolphy/screens/page/post_detail_screen.dart';
+import 'package:evolphy/services/converter.dart';
+import 'package:evolphy/services/firebase_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class BerandaPage extends StatefulWidget {
   const BerandaPage({super.key});
@@ -16,12 +18,102 @@ class BerandaPage extends StatefulWidget {
 }
 
 class _BerandaPage extends State<BerandaPage> {
+  final PostService _firebaseService = PostService();
+  bool _isLoadingMore = false;
+  final List<Map<String, dynamic>> _posts = [];
+  Map<String, dynamic>? _post; // Nullable _post
+  final int _limit = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPosts();
+  }
+
+  Future<void> _loadPosts() async {
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    try {
+      final stream = _firebaseService.getPosts(_limit);
+      stream.listen((QuerySnapshot snapshot) async {
+        if (snapshot.docs.isNotEmpty) {
+          List<Map<String, dynamic>> newPosts = [];
+
+          for (var doc in snapshot.docs) {
+            DocumentSnapshot userDoc =
+                await _firebaseService.getUser(doc['createdBy']);
+            Map<String, dynamic> postData = doc.data() as Map<String, dynamic>;
+            Map<String, dynamic> userData =
+                userDoc.data() as Map<String, dynamic>;
+
+            postData['userImage'] = userData['image'];
+            postData['username'] = userData['username'];
+            postData['postId'] = doc.id; // Adding postId to the post data
+            postData['likes'] =
+                await _firebaseService.getLikesCount(postData['postId']);
+            postData['comments'] =
+                await _firebaseService.getCommentsCount(postData['postId']);
+            postData['isLiked'] =
+                await _firebaseService.isPostLikedByUser(postData['postId']);
+
+            newPosts.add(postData);
+          }
+
+          setState(() {
+            _posts.addAll(newPosts);
+            if (_posts.isNotEmpty) {
+              _post = _posts[0]; // Safely assign _post
+            }
+            _isLoadingMore = false;
+          });
+        } else {
+          setState(() {
+            _isLoadingMore = false;
+          });
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingMore = false;
+      });
+      print("Error loading posts: $e");
+    }
+  }
+
+  void _navigateForum(BuildContext context, Map<String, dynamic>? post) async {
+    if (post == null) return; // Return if post is null
+
+    final result =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return PostDetailScreen(post);
+    }));
+
+    // Check what was returned and act accordingly
+    if (result != null) {
+      _posts.clear(); // Clear the existing posts
+      await _loadPosts(); // Reload the posts
+      setState(() {});
+    }
+  }
+
+  Future<void> _toggleLike(String postId, bool isLiked) async {
+    _firebaseService.toggleLike(postId, isLiked);
+
+    // Refresh posts to reflect the new like status
+    setState(() {
+      _posts.clear();
+    });
+    await _loadPosts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1c202a),
+      backgroundColor: const Color(0xFF1c202a),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         children: [
           SafeArea(
               child: Padding(
@@ -70,16 +162,16 @@ class _BerandaPage extends State<BerandaPage> {
               ],
             ),
           )),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Container(
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: 25,
               right: 25,
             ),
             decoration: BoxDecoration(
-                color: Color(0xFF5c1d8d),
+                color: const Color(0xFF5c1d8d),
                 borderRadius: BorderRadius.circular(15)),
             child: Stack(
               children: [
@@ -90,8 +182,8 @@ class _BerandaPage extends State<BerandaPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 25),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 25),
                             child: Text(
                               "Yey, kamu berada di level 1!",
                               style: TextStyle(
@@ -101,19 +193,19 @@ class _BerandaPage extends State<BerandaPage> {
                               ),
                             ),
                           ),
-                          Text(
+                          const Text(
                             "Unit 1: Energi potensial & energi kinetik",
                             style: TextStyle(
                                 color: Color(0xFFD7D8DB), fontSize: 12),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 15,
                           ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 25),
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
                                 backgroundColor: kWhite,
                               ),
@@ -121,7 +213,7 @@ class _BerandaPage extends State<BerandaPage> {
                                 Provider.of<DataModel>(context, listen: false)
                                     .onNavBarTapped(2);
                               },
-                              child: Text(
+                              child: const Text(
                                 'Mulai Sekarang',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -133,7 +225,7 @@ class _BerandaPage extends State<BerandaPage> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 125,
                     ),
                   ],
@@ -149,29 +241,29 @@ class _BerandaPage extends State<BerandaPage> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             height: 52,
             decoration: BoxDecoration(
-                color: Color(0xFF481585),
+                color: const Color(0xFF481585),
                 borderRadius: BorderRadius.circular(15)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.info_outline,
                   color: Colors.white,
                   size: 18,
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Flexible(
                   child: RichText(
                     softWrap: true,
-                    text: TextSpan(
+                    text: const TextSpan(
                       style: TextStyle(color: Colors.white, fontSize: 12),
                       children: [
                         TextSpan(text: 'Saatnya untuk mengerjakan soal '),
@@ -187,9 +279,9 @@ class _BerandaPage extends State<BerandaPage> {
               ],
             ),
           ),
-          SizedBox(height: 25),
+          const SizedBox(height: 25),
           lihatSemua("Modul Materi", 1, context),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           SizedBox(
@@ -209,7 +301,7 @@ class _BerandaPage extends State<BerandaPage> {
                     child: Container(
                       width: 165,
                       height: 236,
-                      padding: EdgeInsets.all(15),
+                      padding: const EdgeInsets.all(15),
                       decoration: BoxDecoration(
                         color: listJudulMateris[index].color,
                         borderRadius: BorderRadius.circular(8),
@@ -217,13 +309,20 @@ class _BerandaPage extends State<BerandaPage> {
                       child: Stack(
                         clipBehavior: Clip.none,
                         children: [
+                          Positioned(
+                            right: -15,
+                            bottom: 40,
+                            child: SvgPicture.asset(
+                              listJudulMateris[index].image,
+                            ),
+                          ),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
                                 width: 65,
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(100),
@@ -231,17 +330,17 @@ class _BerandaPage extends State<BerandaPage> {
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.diamond,
                                       size: 20,
                                       color: Colors.white,
                                     ),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(
                                       listJudulMateris[index]
                                           .diamond
                                           .toString(),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                       ),
                                     ),
@@ -250,17 +349,10 @@ class _BerandaPage extends State<BerandaPage> {
                               ),
                               Text(
                                 listJudulMateris[index].title,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     color: Colors.white, fontSize: 16),
                               )
                             ],
-                          ),
-                          Positioned(
-                            right: -15,
-                            bottom: 25,
-                            child: SvgPicture.asset(
-                              listJudulMateris[index].image,
-                            ),
                           ),
                         ],
                       ),
@@ -268,97 +360,132 @@ class _BerandaPage extends State<BerandaPage> {
                   );
                 },
                 separatorBuilder: (context, index) {
-                  return SizedBox(
+                  return const SizedBox(
                     width: 15,
                   );
                 }),
           ),
-          SizedBox(
+          const SizedBox(
             height: 25,
           ),
           lihatSemua("Forum", 3, context),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Color(0xFF252836),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Color(0xFFB0B0B0), width: 0.1),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+          GestureDetector(
+            onTap: () {
+              _navigateForum(context, _post);
+            },
+            child: _post != null
+                ? Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                        color: kAbuHitam,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: kAbu, width: 0.5)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          constraints: BoxConstraints(maxWidth: 500),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFebb0ff),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: Image.asset(
-                            "images/profil_orang_diforum.png",
-                            height: 31,
-                          ),
+                        Row(
+                          children: [
+                            _post!['userImage'] != null
+                                ? CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(_post!['userImage']),
+                                  )
+                                : const CircleAvatar(
+                                    backgroundColor: kUngu,
+                                    child: Icon(Icons.person),
+                                  ),
+                            const SizedBox(
+                              width: 12,
+                            ),
+                            Expanded(
+                              child: Text(
+                                _post!['username'],
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style:
+                                    kSemiBoldTextStyle.copyWith(fontSize: 16),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              formatTanggal(_post!['createdAt']),
+                              style: kMediumTextStyle.copyWith(
+                                  fontSize: 12, color: kAbuText),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(
+                          height: 20,
+                        ),
                         Text(
-                          "Muhammad Fikran",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                          _post!['content'],
+                          style: kMediumTextStyle,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        (_post!['image_url'] != "")
+                            ? MyNetworkImage(imageURL: _post!['image_url'])
+                            : const SizedBox(),
+                        SizedBox(
+                          height: (_post!['image_url'] != "") ? 20 : 0,
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          width: double.infinity,
+                          height: 1,
+                          color: kAbu,
+                        ),
+                        Row(
+                          children: [
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () {
+                                _toggleLike(
+                                    _post!['postId'], _post!['isLiked']);
+                              },
+                              child: Icon(
+                                _post!['isLiked']
+                                    ? Icons.favorite
+                                    : Icons.favorite_outline,
+                                color: _post!['isLiked'] ? Colors.red : kWhite,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 16,
+                            ),
+                            Text(
+                              _post!['likes'].toString(), // Convert to string
+                              style: kSemiBoldTextStyle,
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.question_answer_outlined,
+                              color: kWhite,
+                            ),
+                            const SizedBox(
+                              width: 16,
+                            ),
+                            Text(
+                              _post!['comments']
+                                  .toString(), // Convert to string
+                              style: kSemiBoldTextStyle,
+                            ),
+                            const Spacer(),
+                          ],
                         ),
                       ],
                     ),
-                    Text(
-                      "2 hari",
-                      style: TextStyle(
-                          color: Color(0xFFB0B0B0),
-                          fontWeight: FontWeight.w500,
-                          fontSize: 11),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 11),
-                Text(
-                  "Aku kesulitan menemukan cara pengerjaan di bagian rangkaian listrik. Apakah ada yang bisa membantu?",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w500),
-                ),
-                SizedBox(height: 11),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.favorite_border_outlined,
-                      color: Colors.white,
-                      size: 17,
-                    ),
-                    SizedBox(width: 5),
-                    Icon(
-                      Icons.chat_bubble_outline,
-                      color: Colors.white,
-                      size: 17,
-                    ),
-                    SizedBox(width: 5),
-                    Icon(
-                      Icons.bookmark_border_outlined,
-                      color: Colors.white,
-                      size: 17,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  )
+                : const SizedBox(), // Show empty box if _post is null
           ),
-          SizedBox(
+          const SizedBox(
             height: 24,
           )
         ],
@@ -374,7 +501,7 @@ Widget lihatSemua(String title, int index, BuildContext context) {
     children: [
       Text(
         title,
-        style: TextStyle(color: Colors.white, fontSize: 16),
+        style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
       InkWell(
         borderRadius: BorderRadius.circular(100),
@@ -382,8 +509,8 @@ Widget lihatSemua(String title, int index, BuildContext context) {
           Provider.of<DataModel>(context, listen: false).onNavBarTapped(index);
         },
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
-          child: Row(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 7),
+          child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
