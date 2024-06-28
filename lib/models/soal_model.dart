@@ -1,10 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/material.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
-
 import 'package:evolphy/components/soal_circle.dart';
 import 'package:evolphy/constants/constant.dart';
-import 'package:evolphy/services/converter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
 
 List<List<SoalCircleFloat>> listKebenaranSoal = [
   [
@@ -472,20 +470,49 @@ List<SoalTryOut> listSoalTryOut = [
 
 class Klasifikasi {
   String title;
+  String image;
+  Color color;
   List<int> noSoal;
 
   Klasifikasi({
     required this.title,
+    required this.image,
+    required this.color,
     required this.noSoal,
   });
 }
 
 List<Klasifikasi> listKlasifikasi = [
-  Klasifikasi(title: "Gerak Parabola", noSoal: [1, 7]),
-  Klasifikasi(title: "Dinamika Rotasi dan Kesetimbangan", noSoal: [2]),
-  Klasifikasi(title: "Gaya Gesek", noSoal: [3, 9, 10]),
-  Klasifikasi(title: "Energi Potensial Pegas", noSoal: [4]),
-  Klasifikasi(title: "Dinamika Partikel", noSoal: [5]),
-  Klasifikasi(title: "Dinamika Rotasi dan Gaya Sentripetal", noSoal: [6]),
-  Klasifikasi(title: "Dinamika Rotasi dan Gaya Newton", noSoal: [8]),
+  Klasifikasi(
+      title: "Gerak Parabola",
+      image: "basket.png",
+      color: kBlue,
+      noSoal: [1, 7]),
+  Klasifikasi(
+      title: "Dinamika Rotasi dan Kesetimbangan",
+      image: "bianglala.png",
+      color: kYellow,
+      noSoal: [2]),
+  Klasifikasi(
+      title: "Gaya Gesek",
+      image: "listrik.png",
+      color: kPurple,
+      noSoal: [3, 9, 10]),
+  Klasifikasi(
+      title: "Energi Potensial Pegas",
+      image: "pensil.png",
+      color: kOrange,
+      noSoal: [4]),
+  Klasifikasi(
+      title: "Dinamika Partikel", image: "ion.png", color: kPink, noSoal: [5]),
+  Klasifikasi(
+      title: "Dinamika Rotasi dan Gaya Sentripetal",
+      image: "listrik.png",
+      color: kBlue,
+      noSoal: [6]),
+  Klasifikasi(
+      title: "Dinamika Rotasi dan Gaya Newton",
+      image: "kilat.png",
+      color: kYellow,
+      noSoal: [8]),
 ];

@@ -107,7 +107,7 @@ class _TryOutPageState extends State<TryOutPage> {
                 child: TryOutComponent(
                     soal: listSoalTryOut[_selectedIndex].soal,
                     controller: listSoalTryOut[_selectedIndex].controller))),
-        if (true)
+        if (cekUdahKeisi())
           GestureDetector(
             onTap: () {
               ubahKebenaran();

@@ -6,7 +6,6 @@ import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/soal_model.dart';
 import 'package:evolphy/services/converter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class NilaiPage extends StatelessWidget {
   final int jumlahBenar;
@@ -124,9 +123,10 @@ class NilaiPage extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const MateriIcon(
-                                    color: Color(0xFF7BB2FB),
-                                    image: 'images/listrik.png'),
+                                MateriIcon(
+                                    color: listKlasifikasi[i].color,
+                                    image:
+                                        'images/${listKlasifikasi[i].image}'),
                                 const SizedBox(
                                   width: 15,
                                 ),
@@ -176,7 +176,11 @@ class NilaiPage extends StatelessWidget {
                                                                     1]
                                                             .controller
                                                             .text,
-                                                        listSoalTryOut[i]
+                                                        listSoalTryOut[
+                                                                listKlasifikasi[
+                                                                            i]
+                                                                        .noSoal[j] -
+                                                                    1]
                                                             .jawaban),
                                                   ),
                                                 ))

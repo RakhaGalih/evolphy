@@ -45,16 +45,13 @@ bool areValuesEqual(String value1, String value2) {
 
     // Periksa jika string kosong setelah trim
     if (value.isEmpty) {
-      print("Empty or invalid value: '$value'");
       return 0.0;
     }
 
     // Coba konversi ke double, jika gagal kembalikan null
     try {
-      print(value);
       return double.parse(value);
     } catch (e) {
-      print("Error parsing '$value': $e");
       return null;
     }
   }
