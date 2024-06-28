@@ -109,6 +109,7 @@ class LevelPage extends StatelessWidget {
                   color: kPink,
                   image: "tryout.png",
                   title: "Try Out",
+                  isLocked: true,
                   onTap: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
