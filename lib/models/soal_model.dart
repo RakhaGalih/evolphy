@@ -1,8 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:evolphy/components/soal_circle.dart';
-import 'package:evolphy/constants/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
+
+import 'package:evolphy/components/soal_circle.dart';
+import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/services/converter.dart';
 
 List<List<SoalCircleFloat>> listKebenaranSoal = [
   [
@@ -14,19 +16,6 @@ List<List<SoalCircleFloat>> listKebenaranSoal = [
     const SoalCircleFloat(no: 2, isTrue: true),
     const SoalCircleFloat(no: 4, isTrue: false),
     const SoalCircleFloat(no: 7, isTrue: true),
-  ],
-];
-
-List<List<int>> listKategoriSoal = [
-  [1, 8, 10],
-  [2, 4, 7],
-  [
-    3,
-    5,
-  ],
-  [
-    6,
-    9,
   ],
 ];
 
@@ -62,6 +51,17 @@ class Soal {
     required this.soal,
     required this.pertanyaan,
     required this.controller,
+  });
+}
+
+class SoalTryOut {
+  final TextSpan soal;
+  final TextEditingController controller;
+  final String jawaban;
+  const SoalTryOut({
+    required this.soal,
+    required this.controller,
+    required this.jawaban,
   });
 }
 
@@ -336,4 +336,156 @@ List<SoalTemp> listSoalTemp = [
     ),
     controller: soal1controller,
   ),
+];
+
+List<SoalTryOut> listSoalTryOut = [
+  SoalTryOut(
+      soal: TextSpan(style: kMediumTextStyle.copyWith(fontSize: 16), children: [
+        const TextSpan(
+            text:
+                "Dua bola identik dilepaskan dari ketinggian yang sama namun bola pertama diberikan kecepatan horisontal awal sebesar 𝑣 sedangkan bola kedua tidak. Diketahui bahwa bola pertama mengenai batu setinggi 5 m yang berada pada jarak 𝑑 dari titik awal, sedangkan bola kedua terdengar mengenai tanah beberapa saat kemudian. Jika diketahui bahwa "),
+        WidgetSpan(
+          child: Math.tex(
+            r'gd\frac{d^2}{v^2} = 20 \, \text{m}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text: ', maka ketinggian awal bola kedua adalah ... m.',
+        ),
+      ]),
+      controller: soal1controller,
+      jawaban: "15"),
+  SoalTryOut(
+      soal: TextSpan(
+          style: kMediumTextStyle.copyWith(fontSize: 16),
+          children: const [
+            TextSpan(
+                text:
+                    "Silinder bermassa 𝑚 = 1 kg dengan jejari 𝑟 = 1 cm dalam keadaan diam ditopang balok pada titik B. Balok kemudian ditarik sehingga balok bergeser dengan laju konstan 𝑣 = 0,2 m/s menjauhi silinder. Asumsikan awalnya balok sangat dekat dengan dinding. Abaikan silinder dengan dinding dan bola. Jarak A-B sama dengan √2 cm. Gaya besar yang diberikan dinding pada silinder adalah ... N."),
+          ]),
+      controller: soal2controller,
+      jawaban: "5.1"),
+  SoalTryOut(
+      soal: TextSpan(style: kMediumTextStyle.copyWith(fontSize: 16), children: [
+        WidgetSpan(
+            child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Center(child: Image.asset('images/soal/no3.png')),
+        )),
+        const TextSpan(
+            text:
+                "\nBola bilier dengan massa 𝑚 = 200 gram dan diameter 𝑑 = 6 cm terletak pada meja horizontal dengan koefisien gesek kinetik antara bola dengan meja adalah 𝜇. Bola dipukul dari titik setinggi 𝑦 di atas garis diameter yang sejajar meja. Bola bergerak menggelinding secara murni. Nilai 𝑦 =…. mm."),
+      ]),
+      controller: soal3controller,
+      jawaban: "12"),
+  SoalTryOut(
+      soal: TextSpan(
+          style: kMediumTextStyle.copyWith(fontSize: 16),
+          children: const [
+            TextSpan(
+                text:
+                    "Sebuah partikel bermassa 𝑚 = 100 g dilontarkan secara horizontal oleh sebuah pegas berkonstanta 𝑘 = 100 N/m dari pinggir sebuah tebing yang memiliki ketinggian ℎ = 5 m dari permukaan laut. Benda mulanya ditekan ke arah pegas sejauh 𝑥 = 20 cm, kemudian dilepaskan. Terdapat tebing lain dengan ketinggian yang sama berjarak 𝑑 = 3 m dari tebing pertama. Jika tiap tumbukan dianggap elastis, partikel akan memantul sebanyak ... kali sebelum sampai ke permukaan laut."),
+          ]),
+      controller: soal4controller,
+      jawaban: "2"),
+  SoalTryOut(
+      soal: TextSpan(
+          style: kMediumTextStyle.copyWith(fontSize: 16),
+          children: const [
+            TextSpan(
+                text:
+                    "Sebuah ember yang bermassa 𝑀 = 0.582 kg penuh berisi air dengan massa 1 kg mula-mula diam di tanah. Ember tersebut ditarik dengan gaya 𝐹0 = 17 N ke atas. Karena terdapat lubang pada bagian bawah ember, air di dalam ember bocor keluar dengan jumlah air persatuan waktu yang konstan dengan kelajuan nol relatif terhadap ember tersebut. Saat waktu 𝑇 = 8 detik, air di dalam ember tersebut kosong. Kecepatan ember pada waktu 𝑇 sama dengan .... m/s."),
+          ]),
+      controller: soal5controller,
+      jawaban: "56"),
+  SoalTryOut(
+      soal: TextSpan(
+          style: kMediumTextStyle.copyWith(fontSize: 16),
+          children: const [
+            TextSpan(
+                text:
+                    "Sebuah bola dengan massa 0.5 kg terikat pada ujung tali yang sangat ringan dan melakukan gerak rotasi vertikal dengan jari-jari 75 cm. Bola memiliki kecepatan 5 m/s pada saat posisi talinya mendatar. Nilai percepatan gravitasi dianggap 𝑔 = 9.8 m/s2 . Gaya tegagan tali saat bola berada di titik terendah lingkaran adalah .... N."),
+          ]),
+      controller: soal6controller,
+      jawaban: "31.4"),
+  SoalTryOut(
+      soal: TextSpan(
+          style: kMediumTextStyle.copyWith(fontSize: 16),
+          children: const [
+            TextSpan(
+                text:
+                    "Dua buah peluru ditembakkan secara bersamaan dengan kecepatan awal 𝑣0 = 25 m/s dari ketinggian ℎ = 25 m. Peluru pertama bersudut 𝜃 terhadap horizontal, sedangkan peluru kedua bersudut awal 180° terhadap peluru pertama. Nilai cos 𝜃 = 0.6. Ketika kedua peluru mencapai tanah, jarak antara keduanya adalah .... meter"),
+          ]),
+      controller: soal7controller,
+      jawaban: "90"),
+  SoalTryOut(
+      soal: TextSpan(style: kMediumTextStyle.copyWith(fontSize: 16), children: [
+        WidgetSpan(
+            child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Center(child: Image.asset('images/soal/no8.png')),
+        )),
+        const TextSpan(
+            text:
+                "Sebuah batang tipis homogen AB bermassa 𝑚 = 1.0 kg bergerak translasi dengan percepatan 𝑎 = 2.0 m/s2 akibat dua gaya yang saling berlawanan 𝐹1 dan 𝐹2 (lihat gambar). Jarak antara titik-titik di mana gaya-gaya ini diterapkan adalah 𝑏 = 20 cm. Jika diketahui 𝐹2 = 5.0 N maka panjang batang tersebut ... m."),
+      ]),
+      controller: soal8controller,
+      jawaban: "1"),
+  SoalTryOut(
+      soal: TextSpan(style: kMediumTextStyle.copyWith(fontSize: 16), children: [
+        WidgetSpan(
+            child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Center(child: Image.asset('images/soal/no9.png')),
+        )),
+        const TextSpan(
+            text:
+                "Dua buah balok identik bermassa 𝑚𝐵 = 1 kg diletakkan di atas papan panjang bermassa 𝑚𝑃 = 4 kg yang akan ditarik dengan gaya 𝐹. Koefisien gesek statik antara balok 1 dan 2 dengan papan masing-masing adalah 𝜇𝑠1 = 0.8 dan "),
+        WidgetSpan(
+          child: Math.tex(
+            r' 𝜇𝑠2 =\frac{𝜇𝑠1}{2}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text:
+              ", sedangkan koefisien gesek kinetiknya sama sebesar 𝜇𝑘 = 0.3. Agar kedua balok dapat bertumbukan, dan jika 𝐹 minimum dan maksimum masing-masing bernilai 𝑝 dan 𝑞, maka 𝑝 + 𝑞 adalah ... N.",
+        ),
+      ]),
+      controller: soal9controller,
+      jawaban: "65.7"),
+  SoalTryOut(
+      soal: TextSpan(style: kMediumTextStyle.copyWith(fontSize: 16), children: [
+        WidgetSpan(
+            child: Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Center(child: Image.asset('images/soal/no10.png')),
+        )),
+        const TextSpan(
+            text:
+                "Sebuah batang dengan panjang 𝐿 = 4 m bermassa 𝑚1 = 1 kg diletakkan di atas dua silinder pejal identik berjari-jari 𝑟 = 80 cm dengan massa total 𝑚2 = 2 kg. Sistem tersebut mula-mula diam dan berada di atas bidang miring dengan sudut 𝜃 = 30°. Posisi kedua silinder hampir saling bersentuhan dan awalnya ujung bawah batang tepat ada di atas silinder depan. Jika permukaannya sangat kasar sehingga gaya-gaya gesek kedua silinder sama, maka waktu yang dibutuhkan agar ujung atas batang menyentuh silinder belakang adalah ... s."),
+      ]),
+      controller: soal10controller,
+      jawaban: "1.3"),
+];
+
+class Klasifikasi {
+  String title;
+  List<int> noSoal;
+
+  Klasifikasi({
+    required this.title,
+    required this.noSoal,
+  });
+}
+
+List<Klasifikasi> listKlasifikasi = [
+  Klasifikasi(title: "Gerak Parabola", noSoal: [1, 7]),
+  Klasifikasi(title: "Dinamika Rotasi dan Kesetimbangan", noSoal: [2]),
+  Klasifikasi(title: "Gaya Gesek", noSoal: [3, 9, 10]),
+  Klasifikasi(title: "Energi Potensial Pegas", noSoal: [4]),
+  Klasifikasi(title: "Dinamika Partikel", noSoal: [5]),
+  Klasifikasi(title: "Dinamika Rotasi dan Gaya Sentripetal", noSoal: [6]),
+  Klasifikasi(title: "Dinamika Rotasi dan Gaya Newton", noSoal: [8]),
 ];

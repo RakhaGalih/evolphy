@@ -36,3 +36,38 @@ String formatTanggal(Timestamp time) {
     return 'baru saja';
   }
 }
+
+bool areValuesEqual(String value1, String value2) {
+  // Fungsi untuk mengonversi string ke nilai double setelah normalisasi
+  double? parseValue(String value) {
+    // Hapus spasi di sekitar string dan ganti koma dengan titik
+    value = value.trim().replaceAll(',', '.');
+
+    // Periksa jika string kosong setelah trim
+    if (value.isEmpty) {
+      print("Empty or invalid value: '$value'");
+      return 0.0;
+    }
+
+    // Coba konversi ke double, jika gagal kembalikan null
+    try {
+      print(value);
+      return double.parse(value);
+    } catch (e) {
+      print("Error parsing '$value': $e");
+      return null;
+    }
+  }
+
+  // Normalisasi dan konversi kedua nilai
+  double? num1 = parseValue(value1);
+  double? num2 = parseValue(value2);
+
+  // Jika salah satu nilai null, anggap tidak sama
+  if (num1 == null || num2 == null) {
+    return false;
+  }
+
+  // Bandingkan kedua nilai
+  return num1 == num2;
+}

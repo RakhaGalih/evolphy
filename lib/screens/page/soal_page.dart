@@ -34,8 +34,13 @@ class _SoalPageState extends State<SoalPage> {
         GestureDetector(
           onTap: () {
             if (!widget.isPembahasan) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const NilaiPage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const NilaiPage(
+                            jumlahBenar: 1,
+                            jumlahSoal: 1,
+                          )));
             }
           },
           child: SingleChildScrollView(
@@ -72,7 +77,14 @@ class _SoalPageState extends State<SoalPage> {
             ),
           ),
         ),
-        Expanded(child: SingleChildScrollView(child: listSoal[_selectedIndex])),
+        Expanded(
+            child: SingleChildScrollView(
+                child: SoalComponent(
+                    soal: listSoalTemp[_selectedIndex].soal,
+                    pertanyaan: listSoalTemp[_selectedIndex].pertanyaan,
+                    pembahasan: listSoalTemp[_selectedIndex].pembahasan,
+                    controller: listSoalTemp[_selectedIndex].controller,
+                    isDone: widget.isPembahasan))),
         SafeArea(
           top: false,
           child: Padding(

@@ -1,5 +1,5 @@
 import 'package:evolphy/constants/constant.dart';
-import 'package:evolphy/screens/page/soal_page.dart';
+import 'package:evolphy/screens/page/level_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -72,9 +72,7 @@ class Leveling extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SoalPage(
-                                    isPembahasan: false,
-                                  )));
+                              builder: (context) => const LevelPage()));
                     },
                     child: Align(
                         alignment: Alignment.centerLeft,

@@ -2,7 +2,6 @@
 import 'package:evolphy/components/card_garis.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/materi_model.dart';
-import 'package:evolphy/screens/page/materi_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 class MateriIcon extends StatelessWidget {
@@ -30,13 +29,17 @@ class MateriCard extends StatelessWidget {
   final Color color;
   final String image;
   final String title;
-  final ModelMateri materi;
+  final ModelMateri? materi;
+  final bool? isLocked;
+  final void Function() onTap;
   const MateriCard({
     super.key,
     required this.color,
     required this.image,
     required this.title,
-    required this.materi,
+    this.materi,
+    this.isLocked,
+    required this.onTap,
   });
 
   @override
@@ -44,13 +47,7 @@ class MateriCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: GestureDetector(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return DetailMateriPage(
-              materi: materi,
-            );
-          }));
-        },
+        onTap: onTap,
         child: CardGaris(
             child: Row(
           children: [
@@ -64,10 +61,15 @@ class MateriCard extends StatelessWidget {
                 style: kSemiBoldTextStyle.copyWith(fontSize: 16),
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: kWhite,
-            )
+            (isLocked ?? false)
+                ? const Icon(
+                    Icons.lock,
+                    color: kWhite,
+                  )
+                : const Icon(
+                    Icons.chevron_right,
+                    color: kWhite,
+                  )
           ],
         )),
       ),
