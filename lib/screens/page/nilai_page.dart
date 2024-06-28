@@ -6,6 +6,7 @@ import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/soal_model.dart';
 import 'package:evolphy/services/converter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class NilaiPage extends StatelessWidget {
   final int jumlahBenar;
@@ -129,56 +130,60 @@ class NilaiPage extends StatelessWidget {
                                 const SizedBox(
                                   width: 15,
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Kinematik',
-                                      style: kSemiBoldTextStyle.copyWith(
-                                          fontSize: 16),
-                                    ),
-                                    const SizedBox(
-                                      height: 12,
-                                    ),
-                                    Row(
-                                      children: [
-                                        for (int j = 0;
-                                            j <
-                                                listKlasifikasi[i]
-                                                    .noSoal
-                                                    .length;
-                                            j++)
-                                          GestureDetector(
-                                              onTap: () {
-                                                /*Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const SoalPage(
-                                                              isPembahasan: true,
-                                                            )));*/
-                                              },
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 10),
-                                                child: SoalCircleFloat(
-                                                  no: listKlasifikasi[i]
-                                                      .noSoal[j],
-                                                  isTrue: areValuesEqual(
-                                                      listSoalTryOut[
-                                                              listKlasifikasi[i]
-                                                                          .noSoal[
-                                                                      j] -
-                                                                  1]
-                                                          .controller
-                                                          .text,
-                                                      listSoalTryOut[i]
-                                                          .jawaban),
-                                                ),
-                                              ))
-                                      ],
-                                    )
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        listKlasifikasi[i].title,
+                                        style: kSemiBoldTextStyle.copyWith(
+                                            fontSize: 16),
+                                      ),
+                                      const SizedBox(
+                                        height: 12,
+                                      ),
+                                      Row(
+                                        children: [
+                                          for (int j = 0;
+                                              j <
+                                                  listKlasifikasi[i]
+                                                      .noSoal
+                                                      .length;
+                                              j++)
+                                            GestureDetector(
+                                                onTap: () {
+                                                  /*Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const SoalPage(
+                                                                isPembahasan: true,
+                                                              )));*/
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 10),
+                                                  child: SoalCircleFloat(
+                                                    no: listKlasifikasi[i]
+                                                        .noSoal[j],
+                                                    isTrue: areValuesEqual(
+                                                        listSoalTryOut[
+                                                                listKlasifikasi[i]
+                                                                            .noSoal[
+                                                                        j] -
+                                                                    1]
+                                                            .controller
+                                                            .text,
+                                                        listSoalTryOut[i]
+                                                            .jawaban),
+                                                  ),
+                                                ))
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
