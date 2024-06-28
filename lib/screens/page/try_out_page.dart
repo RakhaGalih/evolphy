@@ -111,7 +111,7 @@ class _TryOutPageState extends State<TryOutPage> {
           GestureDetector(
             onTap: () {
               ubahKebenaran();
-              Navigator.push(
+              Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                       builder: (context) => NilaiPage(
