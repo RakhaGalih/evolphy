@@ -59,12 +59,41 @@ class LevelPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  decoration: BoxDecoration(
+                      color: kAbu, borderRadius: BorderRadius.circular(100)),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'images/diamond.png',
+                        height: 24,
+                        width: 24,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        '22',
+                        style: kBoldTextStyle.copyWith(fontSize: 18),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
                 Text(
-                  'Materi',
+                  'Ayo semangat mengerjakan soalnya!',
                   style: kBoldTextStyle.copyWith(fontSize: 16),
                 ),
                 const SizedBox(
-                  height: 4,
+                  height: 8,
                 ),
                 MateriCard(
                     color: kBlue,
