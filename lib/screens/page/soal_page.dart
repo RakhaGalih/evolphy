@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:evolphy/components/back_appbar.dart';
+import 'package:evolphy/components/soal.dart';
 import 'package:evolphy/components/soal_circle.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/soal_model.dart';
@@ -18,17 +19,17 @@ class SoalPage extends StatefulWidget {
 }
 
 class _SoalPageState extends State<SoalPage> {
-  int selectedIndex = 0;
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    final bool isLeft = selectedIndex == 0;
-    final bool isRight = selectedIndex == listSoal.length - 1;
+    final bool isLeft = _selectedIndex == 0;
+    final bool isRight = _selectedIndex == listSoal.length - 1;
     return Scaffold(
         body: Column(
       children: [
         const BackAppBar(
-          title: 'Unit 3',
+          title: 'Unit 1',
         ),
         GestureDetector(
           onTap: () {
@@ -51,7 +52,7 @@ class _SoalPageState extends State<SoalPage> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedIndex = i;
+                        _selectedIndex = i;
                       });
                     },
                     child: widget.isPembahasan
@@ -71,7 +72,7 @@ class _SoalPageState extends State<SoalPage> {
             ),
           ),
         ),
-        Expanded(child: SingleChildScrollView(child: listSoal[selectedIndex])),
+        Expanded(child: SingleChildScrollView(child: listSoal[_selectedIndex])),
         SafeArea(
           top: false,
           child: Padding(
@@ -82,7 +83,7 @@ class _SoalPageState extends State<SoalPage> {
                   onTap: () {
                     if (!isLeft) {
                       setState(() {
-                        selectedIndex--;
+                        _selectedIndex--;
                       });
                     }
                   },
@@ -104,7 +105,7 @@ class _SoalPageState extends State<SoalPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${selectedIndex + 1}',
+                      '${_selectedIndex + 1}',
                       style: kSemiBoldTextStyle.copyWith(
                           fontSize: 20, color: kWhite),
                     ),
@@ -121,7 +122,7 @@ class _SoalPageState extends State<SoalPage> {
                   onTap: () {
                     if (!isRight) {
                       setState(() {
-                        selectedIndex++;
+                        _selectedIndex++;
                       });
                     }
                   },

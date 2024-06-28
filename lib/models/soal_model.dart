@@ -1,6 +1,8 @@
-import 'package:evolphy/components/soal.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:evolphy/components/soal_circle.dart';
+import 'package:evolphy/constants/constant.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
 
 List<List<SoalCircleFloat>> listKebenaranSoal = [
   [
@@ -51,6 +53,30 @@ TextEditingController soal7controller = TextEditingController();
 TextEditingController soal8controller = TextEditingController();
 TextEditingController soal9controller = TextEditingController();
 TextEditingController soal10controller = TextEditingController();
+
+class Soal {
+  final String soal;
+  final String pertanyaan;
+  final TextEditingController controller;
+  const Soal({
+    required this.soal,
+    required this.pertanyaan,
+    required this.controller,
+  });
+}
+
+class SoalTemp {
+  final TextSpan soal;
+  final TextSpan pertanyaan;
+  final TextSpan pembahasan;
+  final TextEditingController controller;
+  const SoalTemp({
+    required this.soal,
+    required this.pertanyaan,
+    required this.pembahasan,
+    required this.controller,
+  });
+}
 
 List<Soal> listSoal = [
   Soal(
@@ -120,5 +146,194 @@ List<Soal> listSoal = [
     pertanyaan:
         'Jika permukaannya sangat kasar sehingga gaya-gaya gesek kedua silinder sama, maka waktu yang dibutuhkan agar ujung atas batang menyentuh silinder belakang adalah ... s.',
     controller: soal9controller,
+  ),
+];
+
+List<SoalTemp> listSoalTemp = [
+  SoalTemp(
+      soal: TextSpan(
+        style: kMediumTextStyle.copyWith(fontSize: 16),
+        children: const [
+          TextSpan(
+            text:
+                'Dua bola identik dilepaskan dari ketinggian yang sama namun bola pertama diberikan kecepatan horizontal awal sebesar 𝑣 sedangkan bola kedua tidak. Diketahui bahwa bola pertama mengenai batu setinggi 5 m yang berada pada jarak d dari titik awal, sedangkan bola kedua terdengar mengenai tanah beberapa saat kemudian.',
+          ),
+        ],
+      ),
+      pertanyaan:
+          TextSpan(style: kMediumTextStyle.copyWith(fontSize: 16), children: [
+        const TextSpan(
+          text: 'Jika diketahui bahwa ',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'gd\frac{d^2}{v^2} = 20 \, \text{m}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text: ', maka ketinggian awal bola kedua adalah ... m.',
+        ),
+      ]),
+      pembahasan:
+          TextSpan(style: kMediumTextStyle.copyWith(fontSize: 16), children: [
+        const TextSpan(
+          text:
+              'Bola kedua (sebelah kiri) hanya jatuh bebas saja, waktu jatuhnya sampai bola pertama menumbuk batu adalah ',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r't = \sqrt{\frac{2(h - s)}{g}}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text:
+              '. Bola pertama juga hanya jatuh bebas pada arah vertikal, sehingga waktu tempuhnya sama dengan bola kedua. Di arah horizontal, bola pertama ini hanya bergerak lurus dengan kecepatan konstan, sehingga ',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r't = \frac{d}{v}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text:
+              '.\n\nSamakan kedua waktu ini, kita peroleh ketinggian awal keduanya dari tanah:\n\n',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'\sqrt{\frac{2(h - s)}{g}} = \frac{d}{v}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text: '\n\n',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'2(h - s) = g \frac{d^2}{v^2}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text: '\n\n',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'h = s + \frac{1}{2}g \frac{d^2}{v^2}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        TextSpan(
+          text: '\n\nh = 15.0 m',
+          style: kSemiBoldTextStyle.copyWith(
+              fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ]),
+      controller: soal1controller),
+  SoalTemp(
+    soal: TextSpan(
+      style: kMediumTextStyle.copyWith(fontSize: 16),
+      children: const [
+        TextSpan(
+          text:
+              'Silinder bermassa m = 1 kg dengan jejari r = 1 cm dalam keadaan diam ditopang balok pada titik B. Balok kemudian ditarik sehingga balok bergeser dengan laju konstan v = 0,2 m/s menjauhi silinder. Asumsikan awalnya balok sangat dekat dengan dinding. Abaikan silinder dengan dinding dan bola. Jarak A-B sama dengan √2 cm. Gaya besar yang diberikan dinding pada silinder adalah ... N.',
+        ),
+      ],
+    ),
+    pertanyaan: TextSpan(
+      style: kMediumTextStyle.copyWith(fontSize: 16),
+      children: const [
+        TextSpan(
+          text: 'Gaya besar yang diberikan dinding pada silinder adalah ... N.',
+        ),
+      ],
+    ),
+    pembahasan: TextSpan(
+      style: kMediumTextStyle.copyWith(fontSize: 16),
+      children: [
+        const TextSpan(
+          text:
+              'Permukaan dinding dan balok licin, sehingga tidak ada gaya gesek pada silinder dan silinder tidak berotasi. Pilih titik A sebagai acuan, dan misalkan posisi horizontal titik B adalah x dan posisi vertikal pusat massa silinder adalah y. Maka dari relasi pythagoras, dengan r adalah jari-jari silinder, kita peroleh:',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'r^2 = \frac{x^2}{4} + y^2',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text:
+              ' diferensialkan terhadap waktu satu kali, maka diperoleh: \n\n',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'0 = \frac{1}{2} x \ddot{x} + 2 y \ddot{y} = \frac{x \ddot{x}}{4} + 2y \ddot{y}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text:
+              ' diferensialkan kembali terhadap waktu satu kali kita akan peroleh:',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'0 = \frac{1}{2} \ddot{x} + \frac{1}{2} x \ddot{x} + 2y \ddot{y} + 2 \ddot{y} y',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text: ' kita peroleh: ',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'\ddot{y} = -\frac{1}{4} \ddot{x} \dot{x} - \frac{\dot{x}^2}{4y} - \frac{1}{y}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'\dot{x} = v = 0.2 \text{m/s} = 20 \text{cm/s} = \text{konstan}, \text{maka } \ddot{x} = 0',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'x = \sqrt{2} \text{cm}, r = 1 \text{cm}, y = \frac{1}{2} \sqrt{2} \text{cm}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text: ' kita peroleh:',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'\ddot{y} = -10 \text{cm/s}^2; \ddot{y} = -200 \sqrt{2} \text{cm/s}^2 = -2 \sqrt{2} \text{m/s}^2',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text:
+              'Gaya normal dari balok dan silinder besarnya sama karena balok tidak dipercepat di arah horizontal demikian juga silinder, dan gaya normal ini membentuk sudut 45° terhadap horizontal, sehingga dari F = ma pada arah vertikal untuk silinder, kita peroleh:',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'2N \sin 45° - mg = N \sqrt{2} - mg = m \ddot{y}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+        const TextSpan(
+          text: ' maka diperoleh:',
+        ),
+        WidgetSpan(
+          child: Math.tex(
+            r'N = \frac{mg + m \ddot{y}}{\sqrt{2}} = 5,1 \text{N}',
+            textStyle: kSemiBoldTextStyle.copyWith(fontSize: 16),
+          ),
+        ),
+      ],
+    ),
+    controller: soal1controller,
   ),
 ];

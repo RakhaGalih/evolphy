@@ -1,18 +1,23 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
 
 import 'package:evolphy/constants/constant.dart';
 
-class Soal extends StatelessWidget {
-  final String soal;
-  final String pertanyaan;
+class SoalComponent extends StatelessWidget {
+  final TextSpan soal;
+  final TextSpan pertanyaan;
+  final TextSpan pembahasan;
   final TextEditingController controller;
-  const Soal({
-    Key? key,
+  final bool isDone;
+  const SoalComponent({
+    super.key,
     required this.soal,
     required this.pertanyaan,
+    required this.pembahasan,
     required this.controller,
-  }) : super(key: key);
+    required this.isDone,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +26,10 @@ class Soal extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            soal,
-            textAlign: TextAlign.justify,
-            style: kSemiBoldTextStyle.copyWith(fontSize: 16),
-          ),
+          RichText(
+              textAlign: TextAlign.justify,
+              //soal
+              text: soal),
           const SizedBox(
             height: 24,
           ),
@@ -36,11 +40,10 @@ class Soal extends StatelessWidget {
           const SizedBox(
             height: 12,
           ),
-          Text(
-            pertanyaan,
-            textAlign: TextAlign.justify,
-            style: kSemiBoldTextStyle.copyWith(fontSize: 16),
-          ),
+          RichText(
+              textAlign: TextAlign.justify,
+              //pertanyaan
+              text: pertanyaan),
           const SizedBox(
             height: 12,
           ),
@@ -58,6 +61,7 @@ class Soal extends StatelessWidget {
                 child: SizedBox(
                   height: 40,
                   child: TextField(
+                      enabled: !isDone,
                       controller: controller,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(
@@ -76,6 +80,34 @@ class Soal extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(
+            height: 20,
+          ),
+          if (isDone)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 2,
+                  color: kAbu,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'Pembahasan :',
+                  style: kSemiBoldTextStyle.copyWith(
+                      fontSize: 16, color: kUnguText),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                RichText(
+                    textAlign: TextAlign.justify,
+                    //pembahasan
+                    text: pembahasan)
+              ],
+            ),
         ],
       ),
     );

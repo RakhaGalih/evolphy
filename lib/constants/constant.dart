@@ -18,9 +18,11 @@ const kPurple = Color(0xFF9187FF);
 const kBlue = Color(0xFF7BB2FB);
 const kYellow = Color(0xFFF8FB7B);
 
-const kTitleTextStyle = TextStyle(fontWeight: FontWeight.w500, fontSize: 28);
-const kLightTextStyle = TextStyle(fontWeight: FontWeight.w300);
-const kRegularTextStyle = TextStyle(fontWeight: FontWeight.w400);
-const kMediumTextStyle = TextStyle(fontWeight: FontWeight.w500);
-const kSemiBoldTextStyle = TextStyle(fontWeight: FontWeight.w600);
-const kBoldTextStyle = TextStyle(fontWeight: FontWeight.w700);
+const kTitleTextStyle =
+    TextStyle(fontWeight: FontWeight.w500, fontSize: 28, color: kWhite);
+const kLightTextStyle = TextStyle(fontWeight: FontWeight.w300, color: kWhite);
+const kRegularTextStyle = TextStyle(fontWeight: FontWeight.w400, color: kWhite);
+const kMediumTextStyle = TextStyle(fontWeight: FontWeight.w500, color: kWhite);
+const kSemiBoldTextStyle =
+    TextStyle(fontWeight: FontWeight.w600, color: kWhite);
+const kBoldTextStyle = TextStyle(fontWeight: FontWeight.w700, color: kWhite);
