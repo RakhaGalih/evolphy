@@ -166,7 +166,7 @@ class _BerandaPage extends State<BerandaPage> {
                         width: 5,
                       ),
                       Text(
-                        '22',
+                        '0',
                         style: kBoldTextStyle.copyWith(fontSize: 18),
                       )
                     ],
@@ -211,7 +211,7 @@ class _BerandaPage extends State<BerandaPage> {
                                   ),
                                 ),
                                 const Text(
-                                  "Unit 1: Energi potensial & energi kinetik",
+                                  "Level 1: Pemahaman Fundamental Konsep",
                                   style: TextStyle(
                                       color: Color(0xFFD7D8DB), fontSize: 12),
                                 ),
@@ -284,12 +284,12 @@ class _BerandaPage extends State<BerandaPage> {
                           text: const TextSpan(
                             style: TextStyle(color: Colors.white, fontSize: 12),
                             children: [
-                              TextSpan(text: 'Saatnya untuk mengerjakan soal '),
+                              TextSpan(text: 'Aplikasi '),
                               TextSpan(
-                                text: 'TryOut',
+                                text: 'Evolphy',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              TextSpan(text: ' Elektrodinamika'),
+                              TextSpan(text: ' masih dalam pengembangan'),
                             ],
                           ),
                         ),
