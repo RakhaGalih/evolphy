@@ -132,10 +132,12 @@ class _LevelPageState extends State<LevelPage> {
                   title: "Try Out",
                   isLocked: isLocked,
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const TryOutPage();
-                    }));
+                    if (!isLocked) {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return const TryOutPage();
+                      }));
+                    }
                   },
                 ),
               ],
