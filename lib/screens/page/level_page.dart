@@ -1,11 +1,32 @@
 import 'package:evolphy/components/back_appbar.dart';
 import 'package:evolphy/components/materi_icon.dart';
 import 'package:evolphy/constants/constant.dart';
+import 'package:evolphy/screens/page/soal_ar_page.dart';
 import 'package:evolphy/screens/page/try_out_page.dart';
+import 'package:evolphy/services/shared_preferences_service.dart';
 import 'package:flutter/material.dart';
 
-class LevelPage extends StatelessWidget {
+class LevelPage extends StatefulWidget {
   const LevelPage({super.key});
+
+  @override
+  State<LevelPage> createState() => _LevelPageState();
+}
+
+class _LevelPageState extends State<LevelPage> {
+  late bool isLocked;
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+    load();
+  }
+
+  Future<void> load() async {
+    isLocked = await loadIsLockedFromPrefs();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +57,7 @@ class LevelPage extends StatelessWidget {
                     height: 12,
                   ),
                   Text(
-                    "Level 1 ...",
+                    "Level 1 adalah tahap dasar yang menguji pemahaman fundamental tentang konsep-konsep fisika sederhana yang biasa diimplementasikan pada kompetisi Olimpiadi Sains tingkat Kabupaten.",
                     style: kSemiBoldTextStyle.copyWith(fontSize: 16),
                   ),
                   const SizedBox(
@@ -100,16 +121,16 @@ class LevelPage extends StatelessWidget {
                     image: "solat.png",
                     title: "Latihan Soal AR",
                     onTap: () {
-                      Navigator.push(context,
+                      Navigator.pushReplacement(context,
                           MaterialPageRoute(builder: (context) {
-                        return const TryOutPage();
+                        return const SoalARPage(isPembahasan: false);
                       }));
                     }),
                 MateriCard(
                   color: kPink,
                   image: "tryout.png",
                   title: "Try Out",
-                  isLocked: true,
+                  isLocked: isLocked,
                   onTap: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {

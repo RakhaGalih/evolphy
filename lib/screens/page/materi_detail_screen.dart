@@ -291,6 +291,7 @@ class _DetailMateriPageState extends State<DetailMateriPage>
                                 ),
                                 Text(
                                   widget.materi.desc,
+                                  textAlign: TextAlign.justify,
                                   style: kRegularTextStyle.copyWith(
                                       fontSize: 16, color: kAbuText),
                                 ),

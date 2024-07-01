@@ -516,3 +516,32 @@ List<Klasifikasi> listKlasifikasi = [
       color: kYellow,
       noSoal: [8]),
 ];
+
+TextEditingController pertanyaan1controller = TextEditingController();
+TextEditingController pertanyaan2controller = TextEditingController();
+TextEditingController pertanyaan3controller = TextEditingController();
+
+class PertanyaanAR {
+  String pertanyaan;
+  TextEditingController controller;
+
+  PertanyaanAR({
+    required this.pertanyaan,
+    required this.controller,
+  });
+}
+
+List<PertanyaanAR> listPertanyaanARs = [
+  PertanyaanAR(
+      pertanyaan:
+          'Tentukan lamanya proses dari semenjak bola dilepas sampai tumbukan pertama (t1).',
+      controller: pertanyaan1controller),
+  PertanyaanAR(
+      pertanyaan:
+          'Tentukan lamanya proses dari semenjak tumbukan pertama sampai tumbukan kedua (t2).',
+      controller: pertanyaan2controller),
+  PertanyaanAR(
+      pertanyaan:
+          'Tentukan besarnya kecepatan lemparan bola v0  yang dibutuhkan',
+      controller: pertanyaan3controller),
+];

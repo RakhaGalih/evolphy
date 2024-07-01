@@ -8,6 +8,7 @@ class SoalComponent extends StatelessWidget {
   final TextSpan pembahasan;
   final TextEditingController controller;
   final bool isDone;
+
   const SoalComponent({
     super.key,
     required this.soal,
@@ -180,5 +181,14 @@ class TryOutComponent extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class PertanyaanComponent extends StatelessWidget {
+  const PertanyaanComponent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
