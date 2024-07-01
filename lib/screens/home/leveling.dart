@@ -22,11 +22,11 @@ class Leveling extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Unit 1',
+                      'Latihan soal berbasis AR',
                       style: kSemiBoldTextStyle.copyWith(fontSize: 16),
                     ),
                     Text(
-                      'Energi potensial & energi kinetik',
+                      'Visualisasi solusi AR & tryout per levelnya',
                       style: kRegularTextStyle.copyWith(
                           fontSize: 13, color: kGreySecondary),
                     )
@@ -62,6 +62,7 @@ class Leveling extends StatelessWidget {
           child: SizedBox(
             width: width * 0.65,
             child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 24),
               child: Column(
                 children: [
                   const SizedBox(

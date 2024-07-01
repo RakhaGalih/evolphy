@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/data_model.dart';
 import 'package:evolphy/models/navcard_model.dart';
@@ -52,32 +51,36 @@ class _HomeState extends State<Home> {
         body: widgetOptions[data.selectedNavBar],
         bottomNavigationBar: Container(
           color: const Color(0xFF252836),
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 5),
-          child: SafeArea(
-            child: GNav(
-              selectedIndex: data.selectedNavBar,
-              onTabChange: (index) {
-                Provider.of<DataModel>(context, listen: false)
-                    .onNavBarTapped(index);
-              },
-              backgroundColor: const Color(0xFF252836),
-              color: const Color(0xFF676D75),
-              activeColor: Colors.white,
-              tabBackgroundColor: const Color(0xFF9900CC),
-              gap: 4,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              iconSize: 24,
-              tabs: const [
-                GButton(
-                  icon: Icons.home_outlined,
-                  text: "Beranda",
-                  iconSize: 26,
-                ),
-                GButton(icon: Icons.book, text: "Modul"),
-                GButton(icon: Icons.timeline, text: "Latihan"),
-                GButton(icon: Icons.chat_outlined, text: "Forum"),
-                GButton(icon: Icons.person, text: "Profil"),
-              ],
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Container(
+            color: const Color(0xFF252836),
+            child: SafeArea(
+              child: GNav(
+                style: GnavStyle.google,
+                selectedIndex: data.selectedNavBar,
+                onTabChange: (index) {
+                  Provider.of<DataModel>(context, listen: false)
+                      .onNavBarTapped(index);
+                },
+                color: const Color(0xFF676D75),
+                activeColor: Colors.white,
+                tabBackgroundColor: const Color(0xFF9900CC),
+                gap: 4,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                iconSize: 24,
+                tabs: const [
+                  GButton(
+                    icon: Icons.home_outlined,
+                    text: "Beranda",
+                    iconSize: 26,
+                  ),
+                  GButton(icon: Icons.book, text: "Modul"),
+                  GButton(icon: Icons.timeline, text: "Latihan"),
+                  GButton(icon: Icons.chat_outlined, text: "Forum"),
+                  GButton(icon: Icons.person, text: "Profil"),
+                ],
+              ),
             ),
           ),
         ),

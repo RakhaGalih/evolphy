@@ -14,7 +14,7 @@ class LevelPage extends StatefulWidget {
 }
 
 class _LevelPageState extends State<LevelPage> {
-  late bool isLocked;
+  late bool isLocked = true;
   @override
   void initState() {
     // TODO: implement initState
