@@ -49,7 +49,7 @@ class Leveling extends StatelessWidget {
                       width: 5,
                     ),
                     Text(
-                      '22',
+                      '0',
                       style: kBoldTextStyle.copyWith(fontSize: 18),
                     )
                   ],
