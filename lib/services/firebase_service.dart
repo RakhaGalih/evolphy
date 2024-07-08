@@ -104,6 +104,7 @@ class PostService {
   Stream<QuerySnapshot> searchPosts(String query) {
     return _firestore
         .collection('posts')
+        .orderBy('createdAt', descending: true)
         .where('content', isGreaterThanOrEqualTo: query)
         .where('content', isLessThanOrEqualTo: '$query\uf8ff')
         .snapshots();

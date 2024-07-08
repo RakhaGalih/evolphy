@@ -17,6 +17,8 @@ class _ForumPageState extends State<ForumPage> {
   final PostService _firebaseService = PostService();
   final int _limitIncrement = 4;
   int _limit = 4;
+  bool _isNotFound = false;
+  bool _isSearching = false;
   bool _isLoadingMore = false;
   final List<Map<String, dynamic>> _posts = [];
   // Dokumen terakhir dari batch pertama
@@ -40,7 +42,7 @@ class _ForumPageState extends State<ForumPage> {
 
   void _scrollListener() {
     if (_scrollController.position.atEdge) {
-      if (_scrollController.position.pixels != 0) {
+      if (_scrollController.position.pixels != 0 && !_isSearching) {
         _loadMorePosts();
       }
     }
@@ -60,7 +62,7 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
-  void _loadPosts(Stream<QuerySnapshot> stream) {
+  Future<void> _loadPosts(Stream<QuerySnapshot> stream) async {
     setState(() {
       _isLoadingMore = true;
     });
@@ -101,7 +103,7 @@ class _ForumPageState extends State<ForumPage> {
   }
 
   Future<void> _loadMorePosts() async {
-    if (!_isLoadingMore) {
+    if (!_isLoadingMore && !_isSearching) {
       setState(() {
         _isLoadingMore = true;
         _limit += _limitIncrement;
@@ -130,7 +132,13 @@ class _ForumPageState extends State<ForumPage> {
 
     try {
       final stream = _firebaseService.searchPosts(query);
-      _loadPosts(stream);
+      await _loadPosts(stream);
+      _isSearching = true;
+      if (await stream.isEmpty) {
+        setState(() {
+          _isNotFound = true;
+        });
+      }
     } catch (e) {
       setState(() {
         _isLoadingMore = false;
@@ -139,7 +147,7 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
-  void _navigatePost(BuildContext context) async {
+  void navigatePost(BuildContext context) async {
     final result = await Navigator.pushNamed(context, '/post');
 
     // Check what was returned and act accordingly
@@ -150,7 +158,7 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
-  void _navigateForum(BuildContext context, Map<String, dynamic> post) async {
+  void navigateForum(BuildContext context, Map<String, dynamic> post) async {
     final result =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return PostDetailScreen(post);
@@ -164,7 +172,7 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
-  Future<void> _toggleLike(String postId, bool isLiked) async {
+  Future<void> toggleLike(String postId, bool isLiked) async {
     _firebaseService.toggleLike(postId, isLiked);
 
     // Refresh posts to reflect the new like status
@@ -206,6 +214,18 @@ class _ForumPageState extends State<ForumPage> {
                             prefixIcon: GestureDetector(
                                 onTap: () async {
                                   await _searchPosts(searchController.text);
+                                  if (!_isLoadingMore) {
+                                    if (_posts.isEmpty) {
+                                      setState(() {
+                                        _isNotFound = true;
+                                        _isLoadingMore = false;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _isNotFound = false;
+                                      });
+                                    }
+                                  }
                                 },
                                 child: const Icon(Icons.search)),
                             contentPadding: const EdgeInsets.symmetric(
@@ -224,6 +244,11 @@ class _ForumPageState extends State<ForumPage> {
                         onChanged: (value) async {
                           if (value.isEmpty || value == "" && !_isLoadingMore) {
                             _posts.clear();
+
+                            setState(() {
+                              _isSearching = false;
+                              _isNotFound = false;
+                            });
                             await _fetchPosts();
                           }
                         },
@@ -248,107 +273,111 @@ class _ForumPageState extends State<ForumPage> {
                 height: 40,
               ),
               Expanded(
-                child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    controller: _scrollController,
-                    itemCount: _posts.length,
-                    itemBuilder: (context, index) {
-                      final post = _posts[index];
-                      bool like = false;
-                      return GestureDetector(
-                        onTap: () {
-                          _navigateForum(context, post);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                              color: kAbuHitam,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: kAbu, width: 0.5)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                child: (_isNotFound)
+                    ? const Center(
+                        child: Text('Postingan tidak ditemukan :)'),
+                      )
+                    : ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        controller: _scrollController,
+                        itemCount: _posts.length,
+                        itemBuilder: (context, index) {
+                          final post = _posts[index];
+                          return GestureDetector(
+                            onTap: () {
+                              navigateForum(context, post);
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 20),
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  color: kAbuHitam,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: kAbu, width: 0.5)),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  post['userImage'] != null
-                                      ? CircleAvatar(
-                                          backgroundImage:
-                                              NetworkImage(post['userImage']),
-                                        )
-                                      : const CircleAvatar(
-                                          backgroundColor: kUngu,
-                                          child: Icon(Icons.person),
+                                  Row(
+                                    children: [
+                                      post['userImage'] != null
+                                          ? CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                  post['userImage']),
+                                            )
+                                          : const CircleAvatar(
+                                              backgroundColor: kUngu,
+                                              child: Icon(Icons.person),
+                                            ),
+                                      const SizedBox(
+                                        width: 12,
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          post['username'],
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: kSemiBoldTextStyle.copyWith(
+                                              fontSize: 16),
                                         ),
-                                  const SizedBox(
-                                    width: 12,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        formatTanggal(post['createdAt']),
+                                        style: kMediumTextStyle.copyWith(
+                                            fontSize: 12, color: kAbuText),
+                                      ),
+                                    ],
                                   ),
-                                  Expanded(
-                                    child: Text(
-                                      post['username'],
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: kSemiBoldTextStyle.copyWith(
-                                          fontSize: 16),
-                                    ),
-                                  ),
                                   const SizedBox(
-                                    width: 10,
+                                    height: 20,
                                   ),
                                   Text(
-                                    formatTanggal(post['createdAt']),
-                                    style: kMediumTextStyle.copyWith(
-                                        fontSize: 12, color: kAbuText),
+                                    post['content'],
+                                    style: kMediumTextStyle,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  (post['image_url'] != "")
+                                      ? MyNetworkImage(
+                                          imageURL: post['image_url'])
+                                      : const SizedBox(),
+                                  SizedBox(
+                                    height: (post['image_url'] != "") ? 20 : 0,
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                    width: double.infinity,
+                                    height: 1,
+                                    color: kAbu,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Spacer(),
+                                      LikeButton(post: post),
+                                      const Spacer(),
+                                      const Icon(
+                                        Icons.question_answer_outlined,
+                                        color: kWhite,
+                                      ),
+                                      const SizedBox(
+                                        width: 16,
+                                      ),
+                                      Text(
+                                        post['comments']
+                                            .toString(), // Convert to string
+                                        style: kSemiBoldTextStyle,
+                                      ),
+                                      const Spacer(),
+                                    ],
                                   ),
                                 ],
                               ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Text(
-                                post['content'],
-                                style: kMediumTextStyle,
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              (post['image_url'] != "")
-                                  ? MyNetworkImage(imageURL: post['image_url'])
-                                  : const SizedBox(),
-                              SizedBox(
-                                height: (post['image_url'] != "") ? 20 : 0,
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                width: double.infinity,
-                                height: 1,
-                                color: kAbu,
-                              ),
-                              Row(
-                                children: [
-                                  const Spacer(),
-                                  LikeButton(post: post),
-                                  const Spacer(),
-                                  const Icon(
-                                    Icons.question_answer_outlined,
-                                    color: kWhite,
-                                  ),
-                                  const SizedBox(
-                                    width: 16,
-                                  ),
-                                  Text(
-                                    post['comments']
-                                        .toString(), // Convert to string
-                                    style: kSemiBoldTextStyle,
-                                  ),
-                                  const Spacer(),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
+                            ),
+                          );
+                        }),
               ),
               if (_isLoadingMore)
                 const Padding(
@@ -361,7 +390,7 @@ class _ForumPageState extends State<ForumPage> {
       ),
       floatingActionButton: GestureDetector(
         onTap: () {
-          _navigatePost(context);
+          navigatePost(context);
         },
         child: Container(
           padding: const EdgeInsets.all(12),
