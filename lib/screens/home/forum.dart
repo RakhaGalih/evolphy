@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:evolphy/components/like_button.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/screens/page/post_detail_screen.dart';
 import 'package:evolphy/services/converter.dart';
@@ -326,27 +327,7 @@ class _ForumPageState extends State<ForumPage> {
                               Row(
                                 children: [
                                   const Spacer(),
-                                  GestureDetector(
-                                    onTap: () {
-                                      _toggleLike(
-                                          post['postId'], post['isLiked']);
-                                    },
-                                    child: Icon(
-                                      post['isLiked']
-                                          ? Icons.favorite
-                                          : Icons.favorite_outline,
-                                      color:
-                                          post['isLiked'] ? Colors.red : kWhite,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 16,
-                                  ),
-                                  Text(
-                                    post['likes']
-                                        .toString(), // Convert to string
-                                    style: kSemiBoldTextStyle,
-                                  ),
+                                  LikeButton(post: post),
                                   const Spacer(),
                                   const Icon(
                                     Icons.question_answer_outlined,

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evolphy/components/back_appbar.dart';
+import 'package:evolphy/components/like_button.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/services/converter.dart';
 import 'package:evolphy/services/firebase_service.dart';
@@ -36,7 +37,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     setState(() {
       _isLoadingMore = true;
     });
-    _likes = await _firebaseService.getLikesCount(widget.post['postId']);
+
     final stream = _firebaseService.getComments(widget.post['postId']);
     stream.listen((QuerySnapshot snapshot) async {
       if (snapshot.docs.isNotEmpty) {
@@ -67,17 +68,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         });
       }
     });
-  }
-
-  Future<void> _toggleLike(String postId, bool isLiked) async {
-    await _firebaseService.toggleLike(postId, isLiked);
-
-    // Refresh posts to reflect the new like status
-    _isLiked = await _firebaseService.isPostLikedByUser(postId);
-    _likes = await _firebaseService.getLikesCount(widget.post['postId']);
-
-    setState(() {});
-    print(_isLiked);
   }
 
   @override
@@ -156,25 +146,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           Row(
                             children: [
                               const Spacer(),
-                              GestureDetector(
-                                onTap: () async {
-                                  await _toggleLike(
-                                      widget.post['postId'], _isLiked);
-                                },
-                                child: Icon(
-                                  _isLiked
-                                      ? Icons.favorite
-                                      : Icons.favorite_outline,
-                                  color: _isLiked ? Colors.red : kWhite,
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 16,
-                              ),
-                              Text(
-                                '$_likes',
-                                style: kSemiBoldTextStyle,
-                              ),
+                              LikeButton(post: widget.post),
                               const Spacer(),
                               const Icon(
                                 Icons.question_answer_outlined,
@@ -356,6 +328,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   _comments.clear();
                                   _loadComments();
                                 }
+                                _imageService.clearImage();
                                 setState(() {
                                   _showSpinner = false;
                                 }); // Ensure the UI is refreshed
