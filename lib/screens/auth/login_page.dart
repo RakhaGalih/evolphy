@@ -177,7 +177,12 @@ class _LoginPageState extends State<LoginPage> {
                               const SizedBox(
                                 height: 30,
                               ),
-                              Text(_errorMessage)
+                              Text(
+                                _errorMessage,
+                                textAlign: TextAlign.center,
+                                style: kSemiBoldTextStyle.copyWith(
+                                    fontSize: 16, color: kRed),
+                              )
                               /*
                               const SizedBox(
                                 height: 10,

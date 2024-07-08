@@ -12,6 +12,7 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   bool _showSpinner = false;
+  String? _errorMessage;
   final _formKey = GlobalKey<FormState>();
   final ImageService _imageService = ImageService();
   final PostService _firebaseService = PostService();
@@ -28,9 +29,16 @@ class _PostPageState extends State<PostPage> {
       setState(() {
         _showSpinner = true;
       });
-      await _firebaseService.createPost(
-          _contentController.text, _imageService.selectedImage);
-      Navigator.pop(context, 'update');
+      try {
+        await _firebaseService.createPost(
+            _contentController.text, _imageService.selectedImage);
+        Navigator.pop(context, 'update');
+      } catch (e) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
+
       setState(() {
         _showSpinner = false;
       });
@@ -65,7 +73,9 @@ class _PostPageState extends State<PostPage> {
                         const Spacer(),
                         GestureDetector(
                           onTap: () async {
-                            _post();
+                            if (!_showSpinner) {
+                              _post();
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -111,6 +121,13 @@ class _PostPageState extends State<PostPage> {
                         ),
                       ),
                     ),
+                    if (_errorMessage != null)
+                      Text(
+                        _errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: kSemiBoldTextStyle.copyWith(
+                            fontSize: 16, color: kRed),
+                      ),
                     const SizedBox(
                       height: 20,
                     ),

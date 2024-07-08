@@ -128,6 +128,7 @@ class PostService {
     } else {
       await _firestore.collection('comments').add({
         'postId': postId,
+        'image_url': null,
         'content': content,
         'createdAt': Timestamp.now(),
         'createdBy': _auth.currentUser?.uid,
@@ -204,6 +205,93 @@ class PostService {
       await unlikePost(postId);
     } else {
       await likePost(postId);
+    }
+  }
+
+  Future<void> deletePost(String postId) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot postDoc =
+          await _firestore.collection('posts').doc(postId).get();
+      if (postDoc.exists && postDoc['createdBy'] == user.uid) {
+        // Hapus semua komentar yang terkait dengan post ini
+        QuerySnapshot commentsSnapshot = await _firestore
+            .collection('comments')
+            .where('postId', isEqualTo: postId)
+            .get();
+
+        for (var commentDoc in commentsSnapshot.docs) {
+          await commentDoc.reference.delete();
+          // Hapus gambar dari Storage jika ada di komentar
+          if (commentDoc['image_url'] != "") {
+            Reference ref = _storage.refFromURL(commentDoc['image_url']);
+            await ref.delete();
+          }
+        }
+
+        // Hapus semua likes yang terkait dengan post ini
+        QuerySnapshot likesSnapshot = await _firestore
+            .collection('likes')
+            .where('postId', isEqualTo: postId)
+            .get();
+
+        for (var likeDoc in likesSnapshot.docs) {
+          await likeDoc.reference.delete();
+        }
+
+        // Hapus gambar dari Storage jika ada di post
+        if (postDoc['image_url'] != "") {
+          Reference ref = _storage.refFromURL(postDoc['image_url']);
+          await ref.delete();
+        }
+
+        // Hapus post itu sendiri
+        await _firestore.collection('posts').doc(postId).delete();
+      } else {
+        throw Exception("You can only delete your own posts.");
+      }
+    }
+  }
+
+  Future<bool> isMyPost(String postId) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot postDoc =
+          await _firestore.collection('posts').doc(postId).get();
+      if (postDoc.exists && postDoc['createdBy'] == user.uid) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<bool> isMyComment(String commentId) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot commentDoc =
+          await _firestore.collection('comments').doc(commentId).get();
+      if (commentDoc.exists && commentDoc['createdBy'] == user.uid) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> deleteComment(String commentId) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot commentDoc =
+          await _firestore.collection('comments').doc(commentId).get();
+      if (commentDoc.exists && commentDoc['createdBy'] == user.uid) {
+        await _firestore.collection('comments').doc(commentId).delete();
+        // Hapus gambar dari Storage jika ada
+        if (commentDoc['image_url'] != null) {
+          Reference ref = _storage.refFromURL(commentDoc['image_url']);
+          await ref.delete();
+        }
+      } else {
+        throw Exception("You can only delete your own comments.");
+      }
     }
   }
 }

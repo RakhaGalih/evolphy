@@ -1,8 +1,10 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:evolphy/components/like_button.dart';
+import 'package:evolphy/components/card_garis.dart';
+import 'package:evolphy/components/forum_card.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/screens/page/post_detail_screen.dart';
-import 'package:evolphy/services/converter.dart';
 import 'package:evolphy/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 
@@ -17,12 +19,14 @@ class _ForumPageState extends State<ForumPage> {
   final PostService _firebaseService = PostService();
   final int _limitIncrement = 4;
   int _limit = 4;
+  bool _canDeletePost = false;
   bool _isNotFound = false;
   bool _isSearching = false;
   bool _isLoadingMore = false;
   final List<Map<String, dynamic>> _posts = [];
   // Dokumen terakhir dari batch pertama
   late DocumentSnapshot lastVisible;
+  int? _selectedForum;
   TextEditingController searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -185,208 +189,212 @@ class _ForumPageState extends State<ForumPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 24,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  Center(
+                    child: Text(
+                      'Forum',
+                      style: kSemiBoldTextStyle.copyWith(fontSize: 20),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  SizedBox(
+                    height: 50,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: searchController,
+                            decoration: InputDecoration(
+                                prefixIcon: GestureDetector(
+                                    onTap: () async {
+                                      await _searchPosts(searchController.text);
+                                      if (!_isLoadingMore) {
+                                        if (_posts.isEmpty) {
+                                          setState(() {
+                                            _isNotFound = true;
+                                            _isLoadingMore = false;
+                                          });
+                                        } else {
+                                          setState(() {
+                                            _isNotFound = false;
+                                          });
+                                        }
+                                      }
+                                    },
+                                    child: const Icon(Icons.search)),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 30.0, vertical: 15),
+                                filled: true,
+                                fillColor: kAbuHitam,
+                                hintStyle: const TextStyle(color: kAbu),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                ),
+                                hintText: 'Cari forum'),
+                            onChanged: (value) async {
+                              if (value.isEmpty ||
+                                  value == "" && !_isLoadingMore) {
+                                _posts.clear();
+
+                                setState(() {
+                                  _isSearching = false;
+                                  _isNotFound = false;
+                                });
+                                await _fetchPosts();
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              color: kUngu,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(
+                            Icons.tune,
+                            color: kWhite,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  Expanded(
+                    child: (_isNotFound)
+                        ? const Center(
+                            child: Text('Postingan tidak ditemukan :)'),
+                          )
+                        : ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            controller: _scrollController,
+                            itemCount: _posts.length,
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> post = _posts[index];
+                              return ForumCard(
+                                post: post,
+                                onTap: () {
+                                  navigateForum(context, post);
+                                },
+                                onLongPress: () async {
+                                  setState(() {
+                                    _canDeletePost = false;
+                                  });
+                                  if (await _firebaseService
+                                      .isMyPost(post['postId'])) {
+                                    setState(() {
+                                      _canDeletePost = true;
+                                    });
+                                  }
+                                  setState(() {
+                                    _selectedForum = index;
+                                  });
+                                },
+                              );
+                            }),
+                  ),
+                  if (_isLoadingMore)
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
               ),
-              Center(
-                child: Text(
-                  'Forum',
-                  style: kSemiBoldTextStyle.copyWith(fontSize: 20),
+            ),
+          ),
+          if (_selectedForum != null)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedForum = null;
+                  });
+                },
+                child: Container(
+                  color: Colors.black.withOpacity(0.2),
                 ),
               ),
-              const SizedBox(
-                height: 40,
-              ),
-              SizedBox(
-                height: 50,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: searchController,
-                        decoration: InputDecoration(
-                            prefixIcon: GestureDetector(
-                                onTap: () async {
-                                  await _searchPosts(searchController.text);
-                                  if (!_isLoadingMore) {
-                                    if (_posts.isEmpty) {
-                                      setState(() {
-                                        _isNotFound = true;
-                                        _isLoadingMore = false;
-                                      });
-                                    } else {
-                                      setState(() {
-                                        _isNotFound = false;
-                                      });
-                                    }
-                                  }
-                                },
-                                child: const Icon(Icons.search)),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 30.0, vertical: 15),
-                            filled: true,
-                            fillColor: kAbuHitam,
-                            hintStyle: const TextStyle(color: kAbu),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                            hintText: 'Cari forum'),
-                        onChanged: (value) async {
-                          if (value.isEmpty || value == "" && !_isLoadingMore) {
-                            _posts.clear();
+            ),
+          if (_selectedForum != null)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: (_canDeletePost)
+                        ? screenHeight * 0.2
+                        : screenHeight * 0.17,
+                  ),
+                  ForumCard(
+                      post: _posts[_selectedForum!],
+                      onTap: () {
+                        navigateForum(context, _posts[_selectedForum!]);
+                        _selectedForum = null;
+                      },
+                      onLongPress: () {}),
+                  if (_canDeletePost)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: GestureDetector(
+                        onTap: () async {
+                          await _firebaseService
+                              .deletePost(_posts[_selectedForum!]['postId']);
 
-                            setState(() {
-                              _isSearching = false;
-                              _isNotFound = false;
-                            });
-                            await _fetchPosts();
-                          }
+                          _posts.clear();
+                          await _fetchPosts();
+                          setState(() {
+                            _selectedForum = null;
+                          });
                         },
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                          color: kUngu, borderRadius: BorderRadius.circular(8)),
-                      child: const Icon(
-                        Icons.tune,
-                        color: kWhite,
+                        child: CardGaris(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.delete_outline,
+                                  color: Colors.red),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                'Delete',
+                                style: kSemiBoldTextStyle.copyWith(
+                                    fontSize: 16, color: Colors.red),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     )
-                  ],
-                ),
+                ],
               ),
-              const SizedBox(
-                height: 40,
-              ),
-              Expanded(
-                child: (_isNotFound)
-                    ? const Center(
-                        child: Text('Postingan tidak ditemukan :)'),
-                      )
-                    : ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        controller: _scrollController,
-                        itemCount: _posts.length,
-                        itemBuilder: (context, index) {
-                          final post = _posts[index];
-                          return GestureDetector(
-                            onTap: () {
-                              navigateForum(context, post);
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 20),
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                  color: kAbuHitam,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: kAbu, width: 0.5)),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      post['userImage'] != null
-                                          ? CircleAvatar(
-                                              backgroundImage: NetworkImage(
-                                                  post['userImage']),
-                                            )
-                                          : const CircleAvatar(
-                                              backgroundColor: kUngu,
-                                              child: Icon(Icons.person),
-                                            ),
-                                      const SizedBox(
-                                        width: 12,
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          post['username'],
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: kSemiBoldTextStyle.copyWith(
-                                              fontSize: 16),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        formatTanggal(post['createdAt']),
-                                        style: kMediumTextStyle.copyWith(
-                                            fontSize: 12, color: kAbuText),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Text(
-                                    post['content'],
-                                    style: kMediumTextStyle,
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  (post['image_url'] != "")
-                                      ? MyNetworkImage(
-                                          imageURL: post['image_url'])
-                                      : const SizedBox(),
-                                  SizedBox(
-                                    height: (post['image_url'] != "") ? 20 : 0,
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(bottom: 20),
-                                    width: double.infinity,
-                                    height: 1,
-                                    color: kAbu,
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Spacer(),
-                                      LikeButton(post: post),
-                                      const Spacer(),
-                                      const Icon(
-                                        Icons.question_answer_outlined,
-                                        color: kWhite,
-                                      ),
-                                      const SizedBox(
-                                        width: 16,
-                                      ),
-                                      Text(
-                                        post['comments']
-                                            .toString(), // Convert to string
-                                        style: kSemiBoldTextStyle,
-                                      ),
-                                      const Spacer(),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-              ),
-              if (_isLoadingMore)
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(),
-                ),
-            ],
-          ),
-        ),
+            )
+        ],
       ),
       floatingActionButton: GestureDetector(
         onTap: () {

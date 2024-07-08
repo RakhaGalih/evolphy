@@ -245,7 +245,12 @@ class _SignInPageState extends State<SignInPage> {
                               const SizedBox(
                                 height: 30,
                               ),
-                              Text(_errorMessage)
+                              Text(
+                                _errorMessage,
+                                textAlign: TextAlign.center,
+                                style: kSemiBoldTextStyle.copyWith(
+                                    fontSize: 16, color: kRed),
+                              )
                               /*
                               Row(
                                 children: [
