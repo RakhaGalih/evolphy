@@ -74,6 +74,33 @@ class PostService {
         .snapshots();
   }
 
+  Future<QuerySnapshot> getPostDocument(int limit) {
+    return _firestore
+        .collection('posts')
+        .orderBy('createdAt', descending: true)
+        .limit(limit)
+        .get();
+  }
+
+  Stream<QuerySnapshot> loadMorePosts(DocumentSnapshot lastVisible, int limit) {
+    return _firestore
+        .collection('posts')
+        .orderBy('createdAt', descending: true)
+        .startAfterDocument(lastVisible)
+        .limit(5)
+        .snapshots();
+  }
+
+  Future<QuerySnapshot> loadMorePostsDocument(
+      DocumentSnapshot lastVisible, int limit) {
+    return _firestore
+        .collection('posts')
+        .orderBy('createdAt', descending: true)
+        .startAfterDocument(lastVisible)
+        .limit(5)
+        .get();
+  }
+
   Stream<QuerySnapshot> searchPosts(String query) {
     return _firestore
         .collection('posts')
@@ -86,13 +113,25 @@ class PostService {
     return await _firestore.collection('users').doc(userId).get();
   }
 
-  Future<void> createComment(String postId, String content) async {
-    await _firestore.collection('comments').add({
-      'postId': postId,
-      'content': content,
-      'createdAt': Timestamp.now(),
-      'createdBy': _auth.currentUser?.uid,
-    });
+  Future<void> createComment(
+      String postId, String content, File? imageFile) async {
+    if (imageFile != null) {
+      String imageUrl = await _uploadImage(imageFile);
+      await _firestore.collection('comments').add({
+        'postId': postId,
+        'image_url': imageUrl,
+        'content': content,
+        'createdAt': Timestamp.now(),
+        'createdBy': _auth.currentUser?.uid,
+      });
+    } else {
+      await _firestore.collection('comments').add({
+        'postId': postId,
+        'content': content,
+        'createdAt': Timestamp.now(),
+        'createdBy': _auth.currentUser?.uid,
+      });
+    }
   }
 
   Stream<QuerySnapshot> getComments(String postId) {

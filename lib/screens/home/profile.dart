@@ -66,136 +66,140 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SvgPicture.asset(
-          'images/bg.svg',
-          fit: BoxFit.fitWidth,
-        ),
-        Column(
-          children: [
-            const SizedBox(
-              height: 130,
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(60),
-              child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: kAbuHitam,
-                  child: MyNetworkImage(
-                    imageURL: _image ??
-                        'https://firebasestorage.googleapis.com/v0/b/evolphy-cfb2e.appspot.com/o/Rectangle%206.png?alt=media&token=2b96ff1a-6c58-478d-8c4d-482cf3ba02ef',
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.cover,
-                  )),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              _username ?? 'null',
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: kMediumTextStyle.copyWith(fontSize: 20),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Profile',
-                        style: kMediumTextStyle.copyWith(fontSize: 14),
-                      ),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () async {
-                          await _navigateAndDisplayResult(context);
-                        },
-                        child: Text('Edit Profil',
-                            style: kRegularTextStyle.copyWith(
-                                fontSize: 14, color: kUnguText)),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(15),
-                    margin: const EdgeInsets.symmetric(vertical: 15),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10), color: kGrey),
-                    child: Column(
-                      children: [
-                        ProfileTile(title: 'Username', value: _username),
-                        ProfileTile(title: 'Email', value: _email),
-                        ProfileTile(title: 'No Telepon', value: _telepon),
-                        const ProfileTile(
-                            title: 'Password', value: '••••••••••'),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    'Lainnya',
-                    style: kMediumTextStyle.copyWith(fontSize: 14),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(15),
-                    margin: const EdgeInsets.symmetric(vertical: 15),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10), color: kGrey),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            const IconProfileTile(
-                              title: 'Notifikasi',
-                              color: kWhite,
-                              icon: Icons.notifications_outlined,
-                            ),
-                            const Spacer(),
-                            Switch(
-                              // This bool value toggles the switch.
-                              value: light,
-                              activeColor: kUnguText,
-                              onChanged: (bool value) {
-                                // This is called when the user toggles the switch.
-                                setState(() {
-                                  light = value;
-                                });
-                              },
-                            )
-                          ],
-                        ),
-                        const IconProfileTile(
-                          title: 'Help & Support',
-                          color: kWhite,
-                          icon: Icons.support_agent_outlined,
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            logOut(context);
-                          },
-                          child: const IconProfileTile(
-                            title: 'Logout',
-                            color: kRed,
-                            icon: Icons.logout,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+    return SingleChildScrollView(
+      child: Stack(
+        children: [
+          SvgPicture.asset(
+            'images/bg.svg',
+            fit: BoxFit.fitWidth,
+          ),
+          Column(
+            children: [
+              const SizedBox(
+                height: 130,
               ),
-            )
-          ],
-        )
-      ],
+              ClipRRect(
+                borderRadius: BorderRadius.circular(60),
+                child: CircleAvatar(
+                    radius: 60,
+                    backgroundColor: kAbuHitam,
+                    child: MyNetworkImage(
+                      imageURL: _image ??
+                          'https://firebasestorage.googleapis.com/v0/b/evolphy-cfb2e.appspot.com/o/Rectangle%206.png?alt=media&token=2b96ff1a-6c58-478d-8c4d-482cf3ba02ef',
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.cover,
+                    )),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Text(
+                _username ?? 'null',
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: kMediumTextStyle.copyWith(fontSize: 20),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Profile',
+                          style: kMediumTextStyle.copyWith(fontSize: 14),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () async {
+                            await _navigateAndDisplayResult(context);
+                          },
+                          child: Text('Edit Profil',
+                              style: kRegularTextStyle.copyWith(
+                                  fontSize: 14, color: kUnguText)),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      margin: const EdgeInsets.symmetric(vertical: 15),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: kGrey),
+                      child: Column(
+                        children: [
+                          ProfileTile(title: 'Username', value: _username),
+                          ProfileTile(title: 'Email', value: _email),
+                          ProfileTile(title: 'No Telepon', value: _telepon),
+                          const ProfileTile(
+                              title: 'Password', value: '••••••••••'),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      'Lainnya',
+                      style: kMediumTextStyle.copyWith(fontSize: 14),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      margin: const EdgeInsets.symmetric(vertical: 15),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: kGrey),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const IconProfileTile(
+                                title: 'Notifikasi',
+                                color: kWhite,
+                                icon: Icons.notifications_outlined,
+                              ),
+                              const Spacer(),
+                              Switch(
+                                // This bool value toggles the switch.
+                                value: light,
+                                activeColor: kUnguText,
+                                onChanged: (bool value) {
+                                  // This is called when the user toggles the switch.
+                                  setState(() {
+                                    light = value;
+                                  });
+                                },
+                              )
+                            ],
+                          ),
+                          const IconProfileTile(
+                            title: 'Help & Support',
+                            color: kWhite,
+                            icon: Icons.support_agent_outlined,
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              logOut(context);
+                            },
+                            child: const IconProfileTile(
+                              title: 'Logout',
+                              color: kRed,
+                              icon: Icons.logout,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 }

@@ -17,6 +17,7 @@ class PostDetailScreen extends StatefulWidget {
 
 class _PostDetailScreenState extends State<PostDetailScreen> {
   final PostService _firebaseService = PostService();
+  final ImageService _imageService = ImageService();
   final TextEditingController _commentController = TextEditingController();
   bool _isLoadingMore = false;
   int _likes = 0;
@@ -218,27 +219,39 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                               const SizedBox(
                                 width: 12,
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    comment['username'],
-                                    style: kSemiBoldTextStyle.copyWith(
-                                        fontSize: 16),
-                                  ),
-                                  Text(
-                                    formatTanggal(comment['createdAt']),
-                                    style: kMediumTextStyle.copyWith(
-                                        fontSize: 12, color: kAbuText),
-                                  ),
-                                  const SizedBox(
-                                    height: 12,
-                                  ),
-                                  Text(
-                                    comment['content'],
-                                    style: kMediumTextStyle,
-                                  ),
-                                ],
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      comment['username'],
+                                      style: kSemiBoldTextStyle.copyWith(
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      formatTanggal(comment['createdAt']),
+                                      style: kMediumTextStyle.copyWith(
+                                          fontSize: 12, color: kAbuText),
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    if (comment['image_url'] != null)
+                                      MyNetworkImage(
+                                          imageURL: comment['image_url']),
+                                    const SizedBox(
+                                      height: 12,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 8),
+                                      child: Text(
+                                        comment['content'],
+                                        textAlign: TextAlign.justify,
+                                        style: kMediumTextStyle,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -253,49 +266,113 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               top: false,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _commentController,
-                  decoration: InputDecoration(
-                      focusColor: kUngu,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 30.0, vertical: 20),
-                      iconColor: kWhite,
-                      suffixIcon: GestureDetector(
-                          onTap: () async {
-                            setState(() {
-                              _showSpinner = true;
-                            });
-                            final content = _commentController.text;
-                            if (content.isNotEmpty) {
-                              await _firebaseService.createComment(
-                                  widget.post['postId'], content);
-                              _commentController.clear();
-                              _comments.clear();
-                              _loadComments();
-                            }
-                            setState(() {
-                              _showSpinner = false;
-                            }); // Ensure the UI is refreshed
-                          },
-                          child: Container(
-                              margin: const EdgeInsets.only(right: 7),
-                              decoration: const BoxDecoration(
-                                  color: kUngu, shape: BoxShape.circle),
-                              child: const Icon(
-                                Icons.send,
-                                color: kWhite,
-                              ))),
-                      filled: true,
-                      fillColor: kAbuHitam,
-                      hintStyle: const TextStyle(color: kAbu),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(40),
-                        borderSide: const BorderSide(
-                          width: 0,
-                          style: BorderStyle.none,
-                        ),
+                child: Column(
+                  children: [
+                    if (_imageService.selectedImage != null)
+                      Stack(
+                        children: [
+                          Image.file(_imageService.selectedImage!),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Container(
+                              margin: const EdgeInsets.all(12),
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: kAbuHitam.withOpacity(0.5)),
+                              child: GestureDetector(
+                                  onTap: () async {
+                                    _imageService.clearImage();
+                                    setState(() {});
+                                  },
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: kWhite,
+                                  )),
+                            ),
+                          )
+                        ],
                       ),
-                      hintText: 'Tuliskan komentar yang baik...'),
+                    if (_imageService.selectedImage != null)
+                      const SizedBox(
+                        height: 12,
+                      ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: kAbuHitam,
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                              onTap: () async {
+                                setState(() {
+                                  _showSpinner = true;
+                                });
+                                await _imageService.pickImage();
+                                setState(() {
+                                  _showSpinner = false;
+                                }); // Ensure the UI is refreshed
+                              },
+                              child: Container(
+                                  margin: const EdgeInsets.only(left: 7),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: const BoxDecoration(
+                                      color: kBG, shape: BoxShape.circle),
+                                  child: const Icon(
+                                    Icons.image,
+                                    color: kWhite,
+                                  ))),
+                          Expanded(
+                            child: TextField(
+                              controller: _commentController,
+                              decoration: const InputDecoration(
+                                  focusColor: kUngu,
+                                  iconColor: kWhite,
+                                  filled: false,
+                                  hintStyle: TextStyle(color: kAbu),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      width: 0,
+                                      style: BorderStyle.none,
+                                    ),
+                                  ),
+                                  hintText: 'Tuliskan komentar yang baik...'),
+                            ),
+                          ),
+                          GestureDetector(
+                              onTap: () async {
+                                setState(() {
+                                  _showSpinner = true;
+                                });
+                                final content = _commentController.text;
+                                if (content.isNotEmpty) {
+                                  await _firebaseService.createComment(
+                                      widget.post['postId'],
+                                      content,
+                                      _imageService.selectedImage);
+                                  _commentController.clear();
+                                  _comments.clear();
+                                  _loadComments();
+                                }
+                                setState(() {
+                                  _showSpinner = false;
+                                }); // Ensure the UI is refreshed
+                              },
+                              child: Container(
+                                  margin: const EdgeInsets.only(right: 7),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: const BoxDecoration(
+                                      color: kUngu, shape: BoxShape.circle),
+                                  child: const Icon(
+                                    Icons.send,
+                                    color: kWhite,
+                                  ))),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

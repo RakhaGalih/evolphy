@@ -8,5 +8,6 @@
     "editor.inlineSuggest.fontFamily": "Courier Prime",
     "scm.inputFontFamily": "default",
     "chat.editor.fontFamily": "Courier Prime",
-    "markdown.preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif"
+    "markdown.preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif",
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

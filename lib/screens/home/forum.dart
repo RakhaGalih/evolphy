@@ -18,12 +18,15 @@ class _ForumPageState extends State<ForumPage> {
   int _limit = 4;
   bool _isLoadingMore = false;
   final List<Map<String, dynamic>> _posts = [];
+  // Dokumen terakhir dari batch pertama
+  late DocumentSnapshot lastVisible;
+  TextEditingController searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _loadPosts();
+    _fetchPosts();
     _scrollController.addListener(_scrollListener);
   }
 
@@ -42,47 +45,12 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
-  Future<void> _loadPosts() async {
-    setState(() {
-      _isLoadingMore = true;
-    });
-
+  Future<void> _fetchPosts() async {
     try {
-      final stream = _firebaseService.getPosts(_limit);
-      stream.listen((QuerySnapshot snapshot) async {
-        if (snapshot.docs.isNotEmpty) {
-          List<Map<String, dynamic>> newPosts = [];
-
-          for (var doc in snapshot.docs) {
-            DocumentSnapshot userDoc =
-                await _firebaseService.getUser(doc['createdBy']);
-            Map<String, dynamic> postData = doc.data() as Map<String, dynamic>;
-            Map<String, dynamic> userData =
-                userDoc.data() as Map<String, dynamic>;
-
-            postData['userImage'] = userData['image'];
-            postData['username'] = userData['username'];
-            postData['postId'] = doc.id; // Adding postId to the post data
-            postData['likes'] =
-                await _firebaseService.getLikesCount(postData['postId']);
-            postData['comments'] =
-                await _firebaseService.getCommentsCount(postData['postId']);
-            postData['isLiked'] =
-                await _firebaseService.isPostLikedByUser(postData['postId']);
-
-            newPosts.add(postData);
-          }
-
-          setState(() {
-            _posts.addAll(newPosts);
-            _isLoadingMore = false;
-          });
-        } else {
-          setState(() {
-            _isLoadingMore = false;
-          });
-        }
-      });
+      Stream<QuerySnapshot> stream = _firebaseService.getPosts(_limit);
+      final getPosts = await _firebaseService.getPostDocument(_limit);
+      lastVisible = getPosts.docs.last;
+      _loadPosts(stream);
     } catch (e) {
       setState(() {
         _isLoadingMore = false;
@@ -91,13 +59,65 @@ class _ForumPageState extends State<ForumPage> {
     }
   }
 
+  void _loadPosts(Stream<QuerySnapshot> stream) {
+    setState(() {
+      _isLoadingMore = true;
+    });
+    stream.listen((QuerySnapshot snapshot) async {
+      if (snapshot.docs.isNotEmpty) {
+        List<Map<String, dynamic>> newPosts = [];
+
+        for (var doc in snapshot.docs) {
+          DocumentSnapshot userDoc =
+              await _firebaseService.getUser(doc['createdBy']);
+          Map<String, dynamic> postData = doc.data() as Map<String, dynamic>;
+          Map<String, dynamic> userData =
+              userDoc.data() as Map<String, dynamic>;
+
+          postData['userImage'] = userData['image'];
+          postData['username'] = userData['username'];
+          postData['postId'] = doc.id; // Adding postId to the post data
+          postData['likes'] =
+              await _firebaseService.getLikesCount(postData['postId']);
+          postData['comments'] =
+              await _firebaseService.getCommentsCount(postData['postId']);
+          postData['isLiked'] =
+              await _firebaseService.isPostLikedByUser(postData['postId']);
+
+          newPosts.add(postData);
+        }
+
+        setState(() {
+          _posts.addAll(newPosts);
+          _isLoadingMore = false;
+        });
+      } else {
+        setState(() {
+          _isLoadingMore = false;
+        });
+      }
+    });
+  }
+
   Future<void> _loadMorePosts() async {
     if (!_isLoadingMore) {
       setState(() {
         _isLoadingMore = true;
         _limit += _limitIncrement;
       });
-      _loadPosts();
+      try {
+        Stream<QuerySnapshot> stream =
+            _firebaseService.loadMorePosts(lastVisible, _limitIncrement);
+        final getPosts = await _firebaseService.loadMorePostsDocument(
+            lastVisible, _limitIncrement);
+        lastVisible = getPosts.docs.last;
+        _loadPosts(stream);
+      } catch (e) {
+        setState(() {
+          _isLoadingMore = false;
+        });
+        print("Error loading posts: $e");
+      }
     }
   }
 
@@ -109,40 +129,7 @@ class _ForumPageState extends State<ForumPage> {
 
     try {
       final stream = _firebaseService.searchPosts(query);
-      stream.listen((QuerySnapshot snapshot) async {
-        if (snapshot.docs.isNotEmpty) {
-          List<Map<String, dynamic>> newPosts = [];
-
-          for (var doc in snapshot.docs) {
-            DocumentSnapshot userDoc =
-                await _firebaseService.getUser(doc['createdBy']);
-            Map<String, dynamic> postData = doc.data() as Map<String, dynamic>;
-            Map<String, dynamic> userData =
-                userDoc.data() as Map<String, dynamic>;
-
-            postData['userImage'] = userData['image'];
-            postData['username'] = userData['username'];
-            postData['postId'] = doc.id; // Adding postId to the post data
-            postData['likes'] =
-                await _firebaseService.getLikesCount(postData['postId']);
-            postData['comments'] =
-                await _firebaseService.getCommentsCount(postData['postId']);
-            postData['isLiked'] =
-                await _firebaseService.isPostLikedByUser(postData['postId']);
-
-            newPosts.add(postData);
-          }
-
-          setState(() {
-            _posts.addAll(newPosts);
-            _isLoadingMore = false;
-          });
-        } else {
-          setState(() {
-            _isLoadingMore = false;
-          });
-        }
-      });
+      _loadPosts(stream);
     } catch (e) {
       setState(() {
         _isLoadingMore = false;
@@ -157,7 +144,7 @@ class _ForumPageState extends State<ForumPage> {
     // Check what was returned and act accordingly
     if (result != null) {
       _posts.clear(); // Clear the existing posts
-      await _loadPosts(); // Reload the posts
+      await _fetchPosts(); // Reload the posts
       setState(() {});
     }
   }
@@ -171,7 +158,7 @@ class _ForumPageState extends State<ForumPage> {
     // Check what was returned and act accordingly
     if (result != null) {
       _posts.clear(); // Clear the existing posts
-      await _loadPosts(); // Reload the posts
+      await _fetchPosts(); // Reload the posts
       setState(() {});
     }
   }
@@ -184,7 +171,7 @@ class _ForumPageState extends State<ForumPage> {
       _posts.clear();
       _limit = _limitIncrement;
     });
-    await _loadPosts();
+    await _fetchPosts();
   }
 
   @override
@@ -213,8 +200,13 @@ class _ForumPageState extends State<ForumPage> {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: searchController,
                         decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.search),
+                            prefixIcon: GestureDetector(
+                                onTap: () async {
+                                  await _searchPosts(searchController.text);
+                                },
+                                child: const Icon(Icons.search)),
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 30.0, vertical: 15),
                             filled: true,
@@ -229,11 +221,9 @@ class _ForumPageState extends State<ForumPage> {
                             ),
                             hintText: 'Cari forum'),
                         onChanged: (value) async {
-                          if (value.isEmpty) {
+                          if (value.isEmpty || value == "" && !_isLoadingMore) {
                             _posts.clear();
-                            await _loadPosts();
-                          } else {
-                            await _searchPosts(value);
+                            await _fetchPosts();
                           }
                         },
                       ),
