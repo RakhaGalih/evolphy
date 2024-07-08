@@ -54,6 +54,7 @@ class _SignInPageState extends State<SignInPage> {
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message!;
+        showSpinner = false;
       });
     }
   }

@@ -46,6 +46,13 @@ class MateriPage extends StatelessWidget {
                     style: kSemiBoldTextStyle.copyWith(fontSize: 16),
                   ),
                   const SizedBox(
+                    height: 12,
+                  ),
+                  Text(
+                    "Source : Materi78 & Jendela Sains",
+                    style: kSemiBoldTextStyle.copyWith(fontSize: 12),
+                  ),
+                  const SizedBox(
                     height: 16,
                   ),
                   Container(
@@ -64,7 +71,7 @@ class MateriPage extends StatelessWidget {
                           width: 8,
                         ),
                         Text(
-                          '3 Materi',
+                          '${materi.listMateri.length} Materi',
                           style: kBoldTextStyle.copyWith(fontSize: 16),
                         ),
                         const SizedBox(

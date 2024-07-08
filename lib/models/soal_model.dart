@@ -523,10 +523,12 @@ TextEditingController pertanyaan3controller = TextEditingController();
 
 class PertanyaanAR {
   String pertanyaan;
+  String jawaban;
   TextEditingController controller;
 
   PertanyaanAR({
     required this.pertanyaan,
+    required this.jawaban,
     required this.controller,
   });
 }
@@ -535,13 +537,16 @@ List<PertanyaanAR> listPertanyaanARs = [
   PertanyaanAR(
       pertanyaan:
           'Tentukan lamanya proses dari semenjak bola dilepas sampai tumbukan pertama (t1).',
+      jawaban: "0.5",
       controller: pertanyaan1controller),
   PertanyaanAR(
       pertanyaan:
           'Tentukan lamanya proses dari semenjak tumbukan pertama sampai tumbukan kedua (t2).',
+      jawaban: "0.8",
       controller: pertanyaan2controller),
   PertanyaanAR(
       pertanyaan:
           'Tentukan besarnya kecepatan lemparan bola v0  yang dibutuhkan',
+      jawaban: "2",
       controller: pertanyaan3controller),
 ];

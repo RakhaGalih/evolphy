@@ -4,6 +4,7 @@ import 'package:evolphy/components/soal_circle.dart';
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/soal_model.dart';
 import 'package:evolphy/screens/page/nilai_page.dart';
+import 'package:evolphy/services/converter.dart';
 import 'package:evolphy/services/shared_preferences_service.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +24,9 @@ class _SoalARPageState extends State<SoalARPage> {
   bool isDone() {
     int keisi = 0;
     for (int i = 0; i < listPertanyaanARs.length; i++) {
-      if (listPertanyaanARs[i].controller.text.isNotEmpty) {
+      if (listPertanyaanARs[i].controller.text.isNotEmpty &&
+          areValuesEqual(listPertanyaanARs[i].controller.text,
+              listPertanyaanARs[i].jawaban)) {
         keisi += 1;
       }
     }
@@ -176,8 +179,25 @@ class _SoalARPageState extends State<SoalARPage> {
                         ],
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 12,
                       ),
+                      if (isDones[i])
+                        areValuesEqual(listPertanyaanARs[i].controller.text,
+                                listPertanyaanARs[i].jawaban)
+                            ? Text(
+                                "Mantap, jawaban kamu sudah benar! :D",
+                                style: kSemiBoldTextStyle.copyWith(
+                                    fontSize: 16, color: kUnguText),
+                              )
+                            : Text(
+                                "Jawaban kamu masih salah, nih :)",
+                                style: kSemiBoldTextStyle.copyWith(
+                                    fontSize: 16, color: kRed),
+                              ),
+                      if (isDones[i])
+                        const SizedBox(
+                          height: 20,
+                        ),
                     ],
                   ),
               if (widget.isPembahasan)
