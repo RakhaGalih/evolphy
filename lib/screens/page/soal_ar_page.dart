@@ -24,9 +24,7 @@ class _SoalARPageState extends State<SoalARPage> {
   bool isDone() {
     int keisi = 0;
     for (int i = 0; i < listPertanyaanARs.length; i++) {
-      if (listPertanyaanARs[i].controller.text.isNotEmpty &&
-          areValuesEqual(listPertanyaanARs[i].controller.text,
-              listPertanyaanARs[i].jawaban)) {
+      if (listPertanyaanARs[i].controller.text.isNotEmpty) {
         keisi += 1;
       }
     }
