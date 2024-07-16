@@ -27,12 +27,14 @@ class _LoginPageState extends State<LoginPage> {
       showSpinner = true;
     });
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
       // Navigate to Home Screen
-      Navigator.pushReplacementNamed(context, '/home');
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
       setState(() {
         showSpinner = false;
       });

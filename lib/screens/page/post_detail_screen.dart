@@ -24,11 +24,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   final PostService _firebaseService = PostService();
   final ImageService _imageService = ImageService();
   final TextEditingController _commentController = TextEditingController();
-  bool _isLoadingMore = false;
+
   bool _canDeleteComment = false;
-  final int _likes = 0;
   int? _selectedComment;
-  bool _isLiked = false;
   final List<Map<String, dynamic>> _comments = [];
   bool _showSpinner = false;
 
@@ -36,14 +34,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   void initState() {
     super.initState();
     _loadComments();
-    _isLiked = widget.post['isLiked'];
   }
 
   Future<void> _loadComments() async {
-    setState(() {
-      _isLoadingMore = true;
-    });
-
     final stream = _firebaseService.getComments(widget.post['postId']);
     stream.listen((QuerySnapshot snapshot) async {
       if (snapshot.docs.isNotEmpty) {
@@ -63,15 +56,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
           newComments.add(commentData);
         }
-
-        setState(() {
-          _comments.addAll(newComments);
-          _isLoadingMore = false;
-        });
-      } else {
-        setState(() {
-          _isLoadingMore = false;
-        });
+        _comments.addAll(newComments);
       }
     });
   }

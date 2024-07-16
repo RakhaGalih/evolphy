@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:evolphy/constants/constant.dart';
 import 'package:evolphy/models/data_model.dart';
 import 'package:evolphy/screens/auth/login_page.dart';
@@ -8,6 +9,7 @@ import 'package:evolphy/screens/page/edit_profil.dart';
 import 'package:evolphy/screens/page/materi_page.dart';
 import 'package:evolphy/screens/page/post_detail_screen.dart';
 import 'package:evolphy/screens/page/post_page.dart';
+import 'package:evolphy/services/notification_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -16,15 +18,25 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  NotificationProvider notificationProvider = NotificationProvider();
+  await notificationProvider.initNotification();
+  await notificationProvider.scheduleTwoDayReminder();
   await initializeDateFormatting('id_ID', null);
-  runApp(const MainApp());
+  runApp(MainApp(
+    notificationProvider: notificationProvider,
+  ));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final NotificationProvider notificationProvider;
+  const MainApp({
+    super.key,
+    required this.notificationProvider,
+  });
 
   @override
   Widget build(BuildContext context) {
+    notificationProvider.saveLastOpenedTime();
     return ChangeNotifierProvider<DataModel>(
       create: (_) => DataModel(),
       child: MaterialApp(

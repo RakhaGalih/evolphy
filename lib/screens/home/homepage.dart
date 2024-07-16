@@ -6,6 +6,7 @@ import 'package:evolphy/screens/page/materi_page.dart';
 import 'package:evolphy/screens/page/post_detail_screen.dart';
 import 'package:evolphy/services/converter.dart';
 import 'package:evolphy/services/firebase_service.dart';
+import 'package:evolphy/services/notification_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,9 +20,9 @@ class BerandaPage extends StatefulWidget {
 }
 
 class _BerandaPage extends State<BerandaPage> {
+  final NotificationProvider _notificationProvider = NotificationProvider();
   String? _username;
   final PostService _firebaseService = PostService();
-  bool _isLoadingMore = false;
   final List<Map<String, dynamic>> _posts = [];
   Map<String, dynamic>? _post; // Nullable _post
   final int _limit = 1;
@@ -31,6 +32,7 @@ class _BerandaPage extends State<BerandaPage> {
     super.initState();
     _getDataUser();
     _loadPosts();
+    _notificationProvider.initNotification();
   }
 
   Future<void> _getDataUser() async {
@@ -45,10 +47,6 @@ class _BerandaPage extends State<BerandaPage> {
   }
 
   Future<void> _loadPosts() async {
-    setState(() {
-      _isLoadingMore = true;
-    });
-
     try {
       final stream = _firebaseService.getPosts(_limit);
       stream.listen((QuerySnapshot snapshot) async {
@@ -80,18 +78,10 @@ class _BerandaPage extends State<BerandaPage> {
             if (_posts.isNotEmpty) {
               _post = _posts[0]; // Safely assign _post
             }
-            _isLoadingMore = false;
-          });
-        } else {
-          setState(() {
-            _isLoadingMore = false;
           });
         }
       });
     } catch (e) {
-      setState(() {
-        _isLoadingMore = false;
-      });
       print("Error loading posts: $e");
     }
   }

@@ -1,52 +1,76 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
-class NotificationProvider with ChangeNotifier {
-  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+class NotificationProvider {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
-  NotificationProvider() {
-    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  Future<void> initNotification() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
-    final InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-    _checkLastOpened();
-  }
-
-  Future<void> _saveCurrentTime() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('last_opened', DateTime.now().millisecondsSinceEpoch);
-  }
-
-  Future<void> _checkLastOpened() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int lastOpened = prefs.getInt('last_opened') ?? 0;
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-
-    if (currentTime - lastOpened >= 2 * 1000) {
-      _showNotification();
-    }
-
-    _saveCurrentTime();
-  }
-
-  Future<void> _showNotification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails('your_channel_id', 'your_channel_name',
-            importance: Importance.max,
-            priority: Priority.high,
-            ticker: 'ticker');
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      'Hey there!',
-      'You have not opened the app for 2 days.',
-      platformChannelSpecifics,
-      payload: 'item x',
+        AndroidInitializationSettings('evolphylogo');
+    var initializationSettingsIOS = DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+        onDidReceiveLocalNotification:
+            (int id, String? title, String? body, String? payload) async {});
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse:
+          (NotificationResponse notificationResponse) async {},
     );
+
+    // Initialize timezone data
+    tz.initializeTimeZones();
+  }
+
+  notificationDetails() {
+    return const NotificationDetails(
+        android: AndroidNotificationDetails('channelId', 'channelNsme',
+            importance: Importance.max),
+        iOS: DarwinNotificationDetails());
+  }
+
+  Future showNotification(
+      {int id = 0, String? title, String? body, String? payLoad}) async {
+    return flutterLocalNotificationsPlugin.show(
+        id, title, body, notificationDetails());
+  }
+
+  Future<void> saveLastOpenedTime() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('lastOpenedTime', DateTime.now().millisecondsSinceEpoch);
+  }
+
+  Future<void> scheduleTwoDayReminder() async {
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      0, // Notification ID
+      'Kami merindukanmu!',
+      'Buka aku, ini sudah 2 hari sejak terakhir kali kamu buka aplikasi.',
+      tz.TZDateTime.now(tz.local).add(const Duration(seconds: 12)),
+      notificationDetails(),
+      payload: 'TwoDayReminder',
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.wallClockTime,
+    );
+  }
+
+  Future<void> checkLastOpenedTime() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? lastOpenedTime = prefs.getInt('lastOpenedTime');
+    if (lastOpenedTime != null) {
+      DateTime lastOpenedDateTime =
+          DateTime.fromMillisecondsSinceEpoch(lastOpenedTime);
+      if (DateTime.now().difference(lastOpenedDateTime).inDays >= 2) {
+        await showNotification(
+            id: 1,
+            title: 'We miss you!',
+            body: 'It\'s been 2 days since you last opened the app.');
+      }
+    }
   }
 }

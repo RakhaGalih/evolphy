@@ -21,24 +21,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    List<NavIcon> navIcons = [
-      const NavIcon(
-          icon: FluentIcons.apps_20_regular,
-          activeIcon: FluentIcons.apps_20_filled,
-          color: kUngu),
-      const NavIcon(
-          icon: FluentIcons.apps_list_20_regular,
-          activeIcon: FluentIcons.apps_list_20_filled,
-          color: kUngu),
-      const NavIcon(
-          icon: FluentIcons.heart_20_regular,
-          activeIcon: FluentIcons.heart_20_filled,
-          color: kUngu),
-      const NavIcon(
-          icon: FluentIcons.channel_20_regular,
-          activeIcon: FluentIcons.channel_20_filled,
-          color: kUngu),
-    ];
     return Consumer<DataModel>(builder: (context, data, child) {
       List<Widget> widgetOptions = <Widget>[
         const BerandaPage(),
