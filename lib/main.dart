@@ -22,21 +22,16 @@ void main() async {
   await notificationProvider.initNotification();
   await notificationProvider.scheduleTwoDayReminder();
   await initializeDateFormatting('id_ID', null);
-  runApp(MainApp(
-    notificationProvider: notificationProvider,
-  ));
+  runApp(MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  final NotificationProvider notificationProvider;
   const MainApp({
     super.key,
-    required this.notificationProvider,
   });
 
   @override
   Widget build(BuildContext context) {
-    notificationProvider.saveLastOpenedTime();
     return ChangeNotifierProvider<DataModel>(
       create: (_) => DataModel(),
       child: MaterialApp(

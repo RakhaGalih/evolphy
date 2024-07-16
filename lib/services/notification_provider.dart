@@ -41,36 +41,16 @@ class NotificationProvider {
         id, title, body, notificationDetails());
   }
 
-  Future<void> saveLastOpenedTime() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('lastOpenedTime', DateTime.now().millisecondsSinceEpoch);
-  }
-
   Future<void> scheduleTwoDayReminder() async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       0, // Notification ID
       'Kami merindukanmu!',
       'Buka aku, ini sudah 2 hari sejak terakhir kali kamu buka aplikasi.',
-      tz.TZDateTime.now(tz.local).add(const Duration(seconds: 12)),
+      tz.TZDateTime.now(tz.local).add(const Duration(days: 2)),
       notificationDetails(),
       payload: 'TwoDayReminder',
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.wallClockTime,
     );
-  }
-
-  Future<void> checkLastOpenedTime() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? lastOpenedTime = prefs.getInt('lastOpenedTime');
-    if (lastOpenedTime != null) {
-      DateTime lastOpenedDateTime =
-          DateTime.fromMillisecondsSinceEpoch(lastOpenedTime);
-      if (DateTime.now().difference(lastOpenedDateTime).inDays >= 2) {
-        await showNotification(
-            id: 1,
-            title: 'We miss you!',
-            body: 'It\'s been 2 days since you last opened the app.');
-      }
-    }
   }
 }
