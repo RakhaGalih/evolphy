@@ -32,6 +32,9 @@ Evolphy utilizes Unity for seamless AR integration, creating an immersive and in
 
 Evolphy offers an innovative solution for students preparing for physics competitions. By combining engaging AR features, gamification, and collaborative learning tools, Evolphy empowers students to achieve their academic goals through a modern and collaborative approach to learning. The platform's continuous development and collaboration with school partners ensure its ongoing relevance and effectiveness in supporting physics education.
 
+More at:
+[Evolphy's Instagram](https://www.instagram.com/pkmpm.evolphy/)
+
 
 
 ### Evolphy's Testimonials
